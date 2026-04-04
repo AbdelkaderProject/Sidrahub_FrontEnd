@@ -1,0 +1,219 @@
+:host::ng-deep {
+  .ng-scrollbar {
+    --scrollbar-padding: 1px;
+    --scrollbar-size: 5px;
+    --scrollbar-thumb-color: var(--cui-gray-500, #aab3c5);
+    --scrollbar-thumb-hover-color: var(--cui-gray-400, #cfd4de);
+    --scrollbar-hover-size: calc(var(--scrollbar-size) * 1.5);
+    --scrollbar-border-radius: 5px;
+  }
+
+  .ng-scroll-content {
+    display: flex;
+    min-height: 100%;
+  }
+
+  //.sidebar-nav {
+  //  scrollbar-color: var(--cui-gray-500, #444) transparent;
+  //}
+
+  .sidebar {
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    border-right: 1px solid #e2e8f0;
+    direction: ltr !important;
+  }
+
+  .sidebar-header {
+    border-bottom: 1px solid #e2e8f0;
+    background: #ffffff;
+  }
+
+  .sidebar-nav {
+    padding: 0.75rem 0.75rem 1.5rem;
+    gap: 0.35rem;
+    direction: ltr !important;
+  }
+
+  .sidebar-nav .nav-title {
+    color: #94a3b8;
+    font-weight: 600;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin: 1rem 0 0.35rem;
+  }
+
+  .sidebar-nav .nav-link {
+    color: #334155;
+    border-radius: 10px;
+    padding: 0.55rem 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    transition: all 0.2s ease;
+    direction: ltr !important;
+    text-align: left !important;
+    flex-direction: row !important;
+    justify-content: flex-start !important;
+  }
+
+  .sidebar-nav .nav-link svg,
+  .sidebar-nav .nav-link i {
+    color: #64748b;
+  }
+
+  .sidebar-nav .nav-link:hover {
+    background: rgba(0, 184, 148, 0.08);
+    color: #0f766e;
+  }
+
+  .sidebar-nav .nav-link:hover svg,
+  .sidebar-nav .nav-link:hover i {
+    color: #0f766e;
+  }
+
+  .sidebar-nav .nav-link.active,
+  .sidebar-nav .nav-group.show > .nav-group-toggle {
+    background: linear-gradient(90deg, rgba(0, 235, 181, 0.18) 0%, rgba(0, 184, 148, 0.08) 100%);
+    color: #0f766e;
+    box-shadow: inset 3px 0 0 #00b894;
+  }
+
+  .sidebar-nav .nav-link.active svg,
+  .sidebar-nav .nav-group.show > .nav-group-toggle svg {
+    color: #0f766e;
+  }
+
+  .sidebar-nav .nav-group-items {
+    padding: 0.25rem 0;
+    padding-left: 1.25rem !important;
+    padding-right: 0 !important;
+    direction: ltr !important;
+    margin-left: 0 !important;
+  }
+
+  .sidebar-nav .nav-group-items .nav-link {
+    padding: 0.5rem 0.65rem;
+    font-size: 0.92rem;
+    color: #475569;
+    border-left: 1px dashed #e2e8f0 !important;
+    border-right: none !important;
+    margin-left: 0.35rem !important;
+    margin-right: 0 !important;
+    flex-direction: row !important;
+    justify-content: flex-start !important;
+    text-align: left !important;
+    width: 100%;
+  }
+
+  .sidebar-nav .nav-group-items .nav-link svg,
+  .sidebar-nav .nav-group-items .nav-link i {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  .sidebar-nav .nav-group-items .nav-link.active {
+    background: rgba(15, 118, 110, 0.12);
+    color: #0f766e;
+    border-left-color: #00b894 !important;
+  }
+
+  .sidebar-nav .nav-group-toggle::after {
+    color: #94a3b8;
+    margin-left: auto !important;
+    margin-right: 0 !important;
+    position: static;
+  }
+}
+
+// ng-scrollbar css variables
+//.cui-scrollbar {
+//  --scrollbar-border-radius: 7px;
+//  --scrollbar-padding: 1px;
+//  --scrollbar-viewport-margin: 0;
+//  --scrollbar-track-color: transparent;
+//  --scrollbar-wrapper-color: transparent;
+//  --scrollbar-thumb-color: rgba(0, 0, 0, 0.2);
+//  --scrollbar-thumb-hover-color: var(--scrollbar-thumb-color);
+//  --scrollbar-size: 5px;
+//  --scrollbar-hover-size: var(--scrollbar-size);
+//  --scrollbar-thumb-transition: height ease-out 150ms, width ease-out 150ms;
+//  --scrollbar-track-transition: height ease-out 150ms, width ease-out 150ms;
+//}
+c-sidebar-header.border-bottom {
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+c-sidebar-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  text-decoration: none;
+  background: #ffffff;
+}
+
+c-sidebar-brand img {
+  /* تنسيق الصورة الأساسي */
+  max-height: 32px; /* نفس ارتفاع الـ SVG */
+  width: auto;
+  max-width: 150px; /* لتحديد العرض الأقصى */
+  object-fit: contain; /* للحفاظ على نسبة الأبعاد */
+  
+  /* تأثيرات عند التمرير */
+  transition: all 0.3s ease;
+}
+
+/* عند توسيع الشريط الجانبي */
+.sidebar-brand-full {
+  display: block;
+}
+
+/* عند تصغير الشريط الجانبي */
+.sidebar-brand-narrow {
+  display: none;
+}
+
+/* إذا كنت تريد إخفاء SVG عند وجود الصورة */
+c-sidebar-brand img + svg.sidebar-brand-narrow {
+  display: none;
+}
+
+/* تأثير عند المرور على الشعار */
+c-sidebar-brand:hover img {
+  transform: scale(1.05);
+  opacity: 0.9;
+}
+
+/* تنسيق للشاشات الصغيرة */
+@media (max-width: 768px) {
+  c-sidebar-brand img {
+    max-height: 28px;
+    max-width: 120px;
+  }
+  
+  c-sidebar-header.border-bottom {
+    padding: 0.75rem;
+  }
+}
+
+/* إذا أردت الشعار دائري */
+c-sidebar-brand img.logo-circle {
+  border-radius: 50%;
+  height: 40px;
+  width: 40px;
+  object-fit: cover;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* إذا أردت إضافة خلفية للشعار */
+c-sidebar-brand {
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+}
+

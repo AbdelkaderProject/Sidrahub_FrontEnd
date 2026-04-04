@@ -1,0 +1,40 @@
+<section class="module-page">
+  <div class="module-header">
+    <h1>{{ config().title }}</h1>
+    <p>{{ config().description }}</p>
+  </div>
+
+  <div class="module-grid">
+    <article class="module-card">
+      <h2>Key Features</h2>
+      <ul>
+        <li *ngFor="let feature of config().features">{{ feature }}</li>
+      </ul>
+    </article>
+
+    <article class="module-card">
+      <h2>Statuses</h2>
+      <div class="status-wrap">
+        <span *ngFor="let status of config().statuses" class="status-chip">{{ status }}</span>
+      </div>
+    </article>
+  </div>
+
+  <article class="module-card table-card">
+    <h2>Sample Data</h2>
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th *ngFor="let col of config().tableColumns">{{ col }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of config().tableRows">
+            <td *ngFor="let cell of row">{{ cell }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </article>
+</section>

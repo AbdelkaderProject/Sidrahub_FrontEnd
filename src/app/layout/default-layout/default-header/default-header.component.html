@@ -1,0 +1,20 @@
+<c-container [fluid]="true" class="border-bottom px-4">
+  <c-header-nav class="me-auto d-none d-md-flex">
+    <c-nav-item><a cNavLink routerLink="/dashboard" routerLinkActive="active">Dashboard</a></c-nav-item>
+    <c-nav-item><a cNavLink routerLink="/services" routerLinkActive="active">Services</a></c-nav-item>
+    <c-nav-item><a cNavLink routerLink="/orders" routerLinkActive="active">Orders</a></c-nav-item>
+  </c-header-nav>
+
+  <c-header-nav class="mx-0">
+    <c-dropdown [popperOptions]="{ placement: 'bottom-start' }" variant="nav-item">
+      <button [caret]="false" cDropdownToggle class="py-0 pe-0" aria-label="Open user menu">
+        <c-avatar shape="rounded-1" size="md" textColor="primary"></c-avatar>
+        <span class="ms-2">{{ authService.userName() || 'User' }}</span>
+      </button>
+      <ul cDropdownMenu class="pt-0 w-auto">
+        <li><h6 cDropdownHeader class="bg-body-secondary text-body-secondary fw-semibold py-2 rounded-top">Account</h6></li>
+        <li><a cDropdownItem (click)="logout()">Logout</a></li>
+      </ul>
+    </c-dropdown>
+  </c-header-nav>
+</c-container>

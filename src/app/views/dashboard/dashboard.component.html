@@ -1,0 +1,29 @@
+<section class="business-dashboard">
+  <header class="hero-card">
+    <h1>{{ title }}</h1>
+    <p>{{ subtitle }}</p>
+    <p class="mb-0 mt-2"><strong>{{ scenarioHint }}</strong></p>
+  </header>
+
+  <section class="stats-grid">
+    <article class="stat-card" *ngFor="let stat of stats">
+      <i [class]="stat.icon"></i>
+      <h2>{{ stat.value }}</h2>
+      <p>{{ stat.label }}</p>
+    </article>
+  </section>
+
+  <section class="modules-card">
+    <div class="card-head">
+      <h2>{{ modulesTitle }}</h2>
+      <p>{{ modulesHint }}</p>
+    </div>
+
+    <div class="modules-grid">
+      <a *ngFor="let link of quickLinks" [routerLink]="link.route" class="module-link">
+        <span>{{ link.title }}</span>
+        <small>{{ link.description }}</small>
+      </a>
+    </div>
+  </section>
+</section>

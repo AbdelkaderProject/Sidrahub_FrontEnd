@@ -1,0 +1,174 @@
+@use "@coreui/coreui/scss/coreui" as * with (
+  $enable-deprecation-messages: false
+);
+@use "@coreui/chartjs/scss/coreui-chartjs";
+@use "theme";
+@use "shared-design";
+@use "tables";
+//@use "fixes";
+@use "custom";
+@use "primeflex/primeflex" as *;
+
+@import "primeicons/primeicons.css";
+
+.p-confirm-dialog {
+  border-radius: 12px !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1) !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
+
+  .p-dialog-header {
+    background: linear-gradient(135deg, #f97316 0%, #ea580c 100%) !important;
+    color: white !important;
+
+    .pi-exclamation-triangle {
+      margin-right: 8px;
+      font-size: 1.2em;
+    }
+  }
+
+  .p-dialog-content {
+    padding: 1.5rem !important;
+    color: #475569;
+    font-size: 15px;
+    line-height: 1.5;
+
+    .p-confirm-dialog-message {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+
+      i {
+        color: #f97316;
+        font-size: 1.5em;
+        margin-top: 2px;
+      }
+    }
+  }
+
+  .p-dialog-footer {
+    .p-button {
+      border-radius: 8px !important;
+      padding: 10px 24px !important;
+      font-weight: 500 !important;
+      transition: all 0.2s !important;
+      border: 1px solid transparent !important;
+
+      &:hover {
+        transform: translateY(-1px);
+      }
+
+      &.p-button-secondary {
+        background: #f1f5f9 !important;
+        color: #475569 !important;
+        border-color: #e2e8f0 !important;
+
+        &:hover {
+          background: #e2e8f0 !important;
+        }
+      }
+
+      &.p-button-danger {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+        border: none !important;
+
+        &:hover {
+          background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
+        }
+      }
+    }
+  }
+}
+
+.p-toast {
+  .p-toast-message {
+    border-radius: 8px !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+    border: none !important;
+    margin-bottom: 12px !important;
+
+    &.p-toast-message-success {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+      color: white !important;
+
+      .p-toast-message-icon {
+        color: white !important;
+      }
+    }
+
+    &.p-toast-message-error {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+      color: white !important;
+    }
+
+    &.p-toast-message-warn {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+      color: white !important;
+    }
+
+    &.p-toast-message-info {
+      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%) !important;
+      color: white !important;
+    }
+
+    .p-toast-message-content {
+      padding: 1rem 1.25rem !important;
+    }
+
+    .p-toast-summary {
+      font-weight: 600 !important;
+      font-size: 14px !important;
+    }
+
+    .p-toast-detail {
+      font-size: 13px !important;
+      opacity: 0.9;
+    }
+  }
+}
+
+.modal-overlay .modal-body {
+  padding: 16px 18px !important;
+  background: #f8fafc !important;
+}
+
+.modal-overlay .form-section {
+  margin-bottom: 16px !important;
+  padding-bottom: 0 !important;
+  border-bottom: none !important;
+}
+
+.modal-overlay .form-group {
+  margin-bottom: 12px !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+}
+
+.modal-overlay .form-row,
+.modal-overlay .form-grid {
+  gap: 16px !important;
+}
+
+.modal-overlay .form-label {
+  font-weight: 700 !important;
+  color: #475569 !important;
+  margin-bottom: 6px !important;
+  font-size: 12px !important;
+  letter-spacing: 0.02em !important;
+  text-transform: uppercase !important;
+}
+
+.modal-overlay .form-control,
+.modal-overlay .p-inputtext,
+.modal-overlay textarea,
+.modal-overlay select {
+  border-radius: 8px !important;
+  border: 1px solid #e2e8f0 !important;
+  padding: 9px 12px !important;
+  background: #ffffff !important;
+}
+
+
+

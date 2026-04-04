@@ -1,0 +1,59 @@
+<div class="services-dropdown-container">
+  <div class="dropdown-wrapper">
+    <label [attr.aria-label]="currentLanguage === 'ar' ? 'اختر الخدمة' : 'Select a Service'"
+           class="dropdown-label">
+      {{ currentLanguage === 'ar' ? 'اختر الخدمة' : 'Select a Service' }}
+    </label>
+
+    <p-dropdown
+      [(ngModel)]="selectedService"
+      [options]="services"
+      optionLabel="label_en"
+      [showClear]="true"
+      [filter]="true"
+      filterBy="label_en,label_ar"
+      [placeholder]="currentLanguage === 'ar' ? 'اختر خدمة...' : 'Choose a service...'"
+      class="services-dropdown"
+      (onChange)="onServiceChange($event)"
+      [loading]="isLoading">
+
+      <ng-template let-service pTemplate="item">
+        <div class="service-item">
+          <span>{{ getServiceLabel(service) }}</span>
+        </div>
+      </ng-template>
+
+      <ng-template pTemplate="selectedItem">
+        <div class="selected-service" *ngIf="selectedService">
+          {{ getServiceLabel(selectedService) }}
+        </div>
+        <span *ngIf="!selectedService" class="placeholder">
+          {{ currentLanguage === 'ar' ? 'اختر خدمة...' : 'Choose a service...' }}
+        </span>
+      </ng-template>
+    </p-dropdown>
+
+    <!-- Language Toggle -->
+    <div class="language-toggle">
+      <button
+        [class.active]="currentLanguage === 'en'"
+        (click)="setLanguage('en')"
+        class="lang-btn">
+        English
+      </button>
+      <button
+        [class.active]="currentLanguage === 'ar'"
+        (click)="setLanguage('ar')"
+        class="lang-btn">
+        العربية
+      </button>
+    </div>
+  </div>
+
+  <!-- Display Selected Service -->
+  <div *ngIf="selectedService" class="selected-info">
+    <h3>{{ currentLanguage === 'ar' ? 'الخدمة المختارة' : 'Selected Service' }}</h3>
+    <p class="service-name">{{ getServiceLabel(selectedService) }}</p>
+    <p class="service-id">{{ currentLanguage === 'ar' ? 'المعرف' : 'ID' }}: <code>{{ selectedService.id }}</code></p>
+  </div>
+</div>

@@ -1,0 +1,99 @@
+<div class="login-container">
+  <c-container breakpoint="md">
+    <c-row class="justify-content-center">
+      <c-col md="6" lg="5" xl="4">
+        <c-card class="login-card">
+          <c-card-body class="p-4">
+            <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show" role="alert">
+              <svg cIcon name="cil-check" class="me-2"></svg>
+              {{ successMessage }}
+              <button type="button" class="btn-close" (click)="successMessage = ''"></button>
+            </div>
+
+            <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
+              <svg cIcon name="cil-x-circle" class="me-2"></svg>
+              {{ errorMessage }}
+              <button type="button" class="btn-close" (click)="errorMessage = ''"></button>
+            </div>
+
+            <form (ngSubmit)="onSubmit()" cForm class="login-form">
+              <div class="text-center mb-4">
+                <img class="login-logo" src="assets/images/image.png" alt="Business platform logo">
+                <h1 class="login-title">Business Platform Login</h1>
+                <p class="login-subtitle">Access all business services from one place</p>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label mb-1">Email <span class="text-danger">*</span></label>
+                <c-input-group>
+                  <span cInputGroupText class="input-icon">
+                    <svg cIcon name="cil-user"></svg>
+                  </span>
+                  <input
+                    type="email"
+                    cFormControl
+                    class="form-input"
+                    placeholder="Email"
+                    [(ngModel)]="credentials.email"
+                    name="email"
+                    [disabled]="isLoading"
+                    required
+                    autocomplete="username"
+                  />
+                </c-input-group>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label mb-1">Password <span class="text-danger">*</span></label>
+                <c-input-group>
+                  <span cInputGroupText class="input-icon">
+                    <svg cIcon name="cil-lock-locked"></svg>
+                  </span>
+                  <input
+                    type="password"
+                    cFormControl
+                    class="form-input"
+                    placeholder="Password"
+                    [(ngModel)]="credentials.password"
+                    name="password"
+                    [disabled]="isLoading"
+                    required
+                    autocomplete="current-password"
+                  />
+                </c-input-group>
+              </div>
+
+              <div class="d-flex justify-content-between align-items-center mb-4">
+                <c-form-check>
+                  <input
+                    type="checkbox"
+                    cFormCheckInput
+                    id="rememberMe"
+                    [(ngModel)]="credentials.rememberMe"
+                    name="rememberMe"
+                    [disabled]="isLoading"
+                  />
+                  <label cFormCheckLabel for="rememberMe" class="remember-label">Remember me</label>
+                </c-form-check>
+              </div>
+
+              <button
+                cButton
+                class="login-button w-100"
+                color="primary"
+                type="submit"
+                [disabled]="isLoading"
+              >
+                <span *ngIf="!isLoading">Sign in</span>
+                <span *ngIf="isLoading">
+                  <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                  Loading...
+                </span>
+              </button>
+            </form>
+          </c-card-body>
+        </c-card>
+      </c-col>
+    </c-row>
+  </c-container>
+</div>

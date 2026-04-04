@@ -1,0 +1,96 @@
+.business-dashboard {
+  display: grid;
+  gap: 1rem;
+}
+
+.hero-card {
+  border-radius: 1rem;
+  padding: 1.25rem;
+  color: #ffffff;
+  background: linear-gradient(130deg, #0f766e, #0ea5e9);
+}
+
+.hero-card h1 {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.hero-card p {
+  margin: 0.4rem 0 0;
+  opacity: 0.95;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.8rem;
+}
+
+.stat-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.9rem;
+  padding: 0.9rem;
+}
+
+.stat-card i {
+  font-size: 1.1rem;
+  color: #0284c7;
+}
+
+.stat-card h2 {
+  margin: 0.45rem 0 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.stat-card p {
+  margin: 0.2rem 0 0;
+  color: #6b7280;
+}
+
+.modules-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.9rem;
+  padding: 1rem;
+}
+
+.card-head h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.card-head p {
+  margin: 0.3rem 0 0.9rem;
+  color: #6b7280;
+}
+
+.modules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.75rem;
+}
+
+.module-link {
+  display: block;
+  border: 1px solid #dbeafe;
+  border-radius: 0.7rem;
+  text-decoration: none;
+  background: #f8fbff;
+  padding: 0.75rem;
+  color: #0f172a;
+}
+
+.module-link span {
+  display: block;
+  font-weight: 700;
+}
+
+.module-link small {
+  display: block;
+  margin-top: 0.25rem;
+  color: #475569;
+}

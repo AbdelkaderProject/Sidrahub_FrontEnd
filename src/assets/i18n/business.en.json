@@ -1,0 +1,171 @@
+{
+  "business": {
+    "nav": {
+      "dashboard": "Dashboard",
+      "coreServices": "Core Services",
+      "services": "Services",
+      "orders": "Orders",
+      "billing": "Billing",
+      "consultations": "Consultations",
+      "providers": "Providers",
+      "blog": "Blog",
+      "management": "Management",
+      "adminPanel": "Admin Panel",
+      "logout": "Logout"
+    },
+    "header": {
+      "account": "Account"
+    },
+    "auth": {
+      "loginTitle": "Business Platform Login",
+      "loginSubtitle": "Access all business services from one place",
+      "email": "Email",
+      "password": "Password",
+      "rememberMe": "Remember me",
+      "signIn": "Sign in",
+      "defaultUser": "User",
+      "requiredCredentials": "Please enter both email and password",
+      "loginSuccess": "Login successful, redirecting...",
+      "loginFailed": "Login failed",
+      "unexpectedError": "Unexpected error"
+    },
+    "dashboard": {
+      "title": "Shop Stop One - Business Platform",
+      "subtitle": "Unified workspace for company setup, legal advisory, accounting, HR, workspaces, and partnerships.",
+      "modulesTitle": "Platform Modules",
+      "modulesHint": "Open any module to manage related records and workflows.",
+      "stats": {
+        "totalServices": "Published Services",
+        "activeOrders": "Active Orders",
+        "openInvoices": "Open Invoices",
+        "providers": "Service Providers"
+      },
+      "moduleDescriptions": {
+        "services": "Manage categories, pricing, and estimated delivery time.",
+        "orders": "Track multi-service orders and progress stages.",
+        "billing": "Issue invoices and record payment transactions.",
+        "consultations": "Handle free consultation requests from clients.",
+        "providers": "Manage provider profiles and service assignments.",
+        "blog": "Publish bilingual SEO articles and updates."
+      }
+    },
+    "module": {
+      "features": "Key Features",
+      "statuses": "Statuses",
+      "sampleData": "Sample Data"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "pending": "Pending",
+      "inProgress": "In Progress",
+      "completed": "Completed",
+      "issued": "Issued",
+      "partiallyPaid": "Partially Paid",
+      "paid": "Paid",
+      "responded": "Responded",
+      "onboarding": "Onboarding",
+      "draft": "Draft",
+      "published": "Published",
+      "scheduled": "Scheduled",
+      "operational": "Operational",
+      "monitoring": "Monitoring"
+    },
+    "columns": {
+      "service": "Service",
+      "category": "Category",
+      "price": "Price",
+      "eta": "ETA",
+      "orderNo": "Order #",
+      "client": "Client",
+      "status": "Status",
+      "total": "Total",
+      "invoiceNo": "Invoice #",
+      "amount": "Amount",
+      "ticketNo": "Ticket #",
+      "name": "Name",
+      "provider": "Provider",
+      "type": "Type",
+      "services": "Services",
+      "title": "Title",
+      "language": "Language",
+      "publishedAt": "Published At",
+      "scope": "Scope",
+      "owner": "Owner",
+      "state": "State",
+      "lastUpdate": "Last Update"
+    },
+    "modules": {
+      "services": {
+        "title": "Services Module",
+        "description": "Showcase service categories and maintain pricing, duration, and activation status.",
+        "features": {
+          "catalog": "Browse categories and services",
+          "pricing": "Store base pricing per service",
+          "duration": "Set estimated execution days",
+          "activeState": "Control Active / Inactive state"
+        }
+      },
+      "orders": {
+        "title": "Orders Module",
+        "description": "Create multi-service orders and monitor each order lifecycle from pending to completion.",
+        "features": {
+          "multiServices": "Support multi-service orders",
+          "statusTracking": "Track Pending / In Progress / Completed",
+          "invoiceLinking": "Link orders to invoices",
+          "history": "Keep full order timeline"
+        }
+      },
+      "billing": {
+        "title": "Billing Module",
+        "description": "Generate invoices, register payments, and support multiple payment methods.",
+        "features": {
+          "invoiceCreation": "Issue invoice per order",
+          "paymentRecording": "Record all payment events",
+          "multipleMethods": "Support bank, card, and online payments",
+          "dueTracking": "Follow due dates and invoice status"
+        }
+      },
+      "consultations": {
+        "title": "Consultation Module",
+        "description": "Receive free consultation requests and assign the right service path quickly.",
+        "features": {
+          "freeRequest": "Public free consultation request",
+          "serviceAssignment": "Link request to a service",
+          "statusTracking": "Track Pending / Responded",
+          "leadCapture": "Capture lead contact details"
+        }
+      },
+      "providers": {
+        "title": "Providers Module",
+        "description": "Manage service partners and connect each provider to relevant services.",
+        "features": {
+          "providerProfiles": "Maintain partner profiles",
+          "serviceMapping": "Map providers to services",
+          "availability": "Track operational availability",
+          "qualityControl": "Monitor provider quality and updates"
+        }
+      },
+      "blog": {
+        "title": "Blog Module",
+        "description": "Publish bilingual articles to improve SEO and customer education.",
+        "features": {
+          "seoArticles": "SEO-optimized publishing",
+          "bilingualContent": "Arabic and English support",
+          "slugManagement": "Manage slugs and article URLs",
+          "publishingCalendar": "Plan draft, schedule, and publish"
+        }
+      },
+      "admin": {
+        "title": "Admin Control Module",
+        "description": "Centralized control for users, roles, partners, and platform governance.",
+        "features": {
+          "userManagement": "Manage users and platform accounts",
+          "roleControl": "Control role-based permissions",
+          "contentControl": "Manage blog and service content",
+          "partnerGovernance": "Supervise providers and operation flows"
+        }
+      }
+    }
+  }
+}
