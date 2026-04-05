@@ -91,7 +91,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 };
 
 /**
- * Suppress global toast for expected 404 checks in Crystal layout probing.
+ * Suppress global toast for expected 404 checks in startup/probing requests.
  */
 function shouldIgnoreErrorToast(url: string, status: number): boolean {
   if (status !== 404) {
@@ -100,7 +100,22 @@ function shouldIgnoreErrorToast(url: string, status: number): boolean {
 
   const normalizedUrl = (url || '').toLowerCase();
   return normalizedUrl.includes('/api/crystalreports/default-layouts')
-    || normalizedUrl.includes('/api/crystalreports/default-layout/');
+    || normalizedUrl.includes('/api/crystalreports/default-layout/')
+    || isExpectedStartupProbe(normalizedUrl);
+}
+
+/**
+ * Some app flows intentionally probe optional endpoints on startup and then
+ * fall back to another source when a 404 is returned.
+ */
+function isExpectedStartupProbe(url: string): boolean {
+  const normalizedUrl = (url || '').toLowerCase();
+
+  return normalizedUrl.includes('/api/usergrouppermissions/by-group/')
+    || normalizedUrl.includes('/api/usergrouppermissions/by-user/')
+    || normalizedUrl.includes('/api/usergrouppermissions/by-role/')
+    || normalizedUrl.includes('/api/notifications')
+    || normalizedUrl.includes('/api/notifications/unread-count');
 }
 
 /**

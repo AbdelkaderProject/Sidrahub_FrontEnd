@@ -17,24 +17,50 @@ export function buildNavItems(isAdmin: boolean): INavData[] {
       iconComponent: { name: 'cil-layers' }
     },
     {
-      name: 'Orders',
-      url: '/orders',
-      iconComponent: { name: 'cil-task' }
+      name: 'Service Categories',
+      url: '/service-categories',
+      iconComponent: { name: 'cil-tags' }
     },
     {
-      name: 'Consultations',
-      url: '/consultations',
-      iconComponent: { name: 'cil-chat-bubble' }
+      name: 'Service Packages',
+      url: '/service-packages',
+      iconComponent: { name: 'cil-briefcase' }
     },
     {
-      name: 'Providers',
-      url: '/providers',
-      iconComponent: { name: 'cil-people' }
+      name: 'Articles',
+      url: '/articles',
+      iconComponent: { name: 'cil-description' }
     },
     {
-      name: 'Blog',
-      url: '/blog',
-      iconComponent: { name: 'cil-notes' }
+      name: 'Article Comments',
+      url: '/article-comments',
+      iconComponent: { name: 'cil-comment-square' }
+    },
+    
+    {
+      name: 'Sidebars',
+      url: '/sidebars',
+      iconComponent: { name: 'cil-menu' }
+    },
+    {
+      name: 'Company Profiles',
+      url: '/company-profiles',
+      iconComponent: { name: 'cil-building' }
+    },
+    {
+      name: 'Team Members',
+      url: '/team-members',
+      iconComponent: { name: 'cil-user' }
+    },
+    {
+      name: 'Partners',
+      url: '/partners',
+      iconComponent: { name: 'cil-handshake' }
+    },
+    {
+      name: 'Branches',
+      url: '/branches',
+      iconComponent: { name: 'cil-location-pin' }
     }
   ];
 
@@ -44,9 +70,24 @@ export function buildNavItems(isAdmin: boolean): INavData[] {
       name: 'Management'
     });
     items.push({
-      name: 'Admin Panel',
-      url: '/admin',
-      iconComponent: { name: 'cil-settings' }
+      name: 'Admin APIs',
+      url: '/admin/articles',
+      iconComponent: { name: 'cil-settings' },
+      children: [
+        { name: 'ArticleComments', url: '/admin/article-comments' },
+        { name: 'Articles', url: '/admin/articles' },
+        { name: 'Auth', url: '/admin/auth' },
+        { name: 'CompanyProfiles', url: '/admin/company-profiles' },
+        { name: 'Localization', url: '/admin/localization' },
+        { name: 'ServiceCategories', url: '/admin/service-categories' },
+        { name: 'ServicePackages', url: '/admin/service-packages' },
+        { name: 'Services', url: '/admin/services' },
+        { name: 'Setup', url: '/admin/setup' },
+        { name: 'Sidebars', url: '/admin/sidebars' },
+        { name: 'TeamMembers', url: '/admin/team-members' },
+        { name: 'Partners', url: '/admin/partners' },
+        { name: 'Branches', url: '/admin/branches' }
+      ]
     });
   }
 

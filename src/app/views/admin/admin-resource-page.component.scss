@@ -1,0 +1,142 @@
+@use "../../../scss/shared-design" as design;
+
+.crud-filters-card {
+  @include design.card-style;
+  padding: design.$spacing-lg;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: design.$spacing-sm;
+}
+
+.search-box i {
+  color: design.$text-secondary;
+}
+
+.records-count {
+  color: design.$text-secondary;
+  font-size: design.$font-size-sm;
+  font-weight: design.$font-weight-semibold;
+}
+
+.admin-table thead th {
+  background: #f8fafc;
+  color: #1f2937;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  text-align: left;
+}
+
+.admin-table th:last-child,
+.admin-table td:last-child {
+  text-align: right;
+}
+
+.actions-column {
+  width: 1%;
+  min-width: 150px;
+  white-space: nowrap;
+  text-align: right;
+}
+
+.actions-cell {
+  display: flex;
+  gap: design.$spacing-sm;
+  justify-content: flex-end;
+  align-items: flex-start;
+  white-space: nowrap;
+  width: fit-content;
+  margin-left: auto;
+}
+
+.admin-table tbody td {
+  vertical-align: top;
+}
+
+.action-btn {
+  border: 0;
+  border-radius: design.$border-radius-sm;
+  padding: 8px 14px;
+  font-size: design.$font-size-sm;
+  font-weight: design.$font-weight-semibold;
+  cursor: pointer;
+  transition: transform design.$transition-fast, opacity design.$transition-fast;
+}
+
+.action-btn:hover {
+  transform: translateY(-1px);
+}
+
+.action-btn-edit {
+  background: rgba(59, 130, 246, 0.12);
+  color: design.$primary-blue-dark;
+}
+
+.action-btn-delete {
+  background: rgba(239, 68, 68, 0.12);
+  color: design.$danger-color;
+}
+
+.crud-form-grid {
+  display: grid;
+  gap: design.$spacing-lg;
+}
+
+.crud-form-field {
+  display: grid;
+  gap: 6px;
+}
+
+.crud-form-field label {
+  color: design.$text-primary;
+  font-size: design.$font-size-sm;
+  font-weight: design.$font-weight-semibold;
+}
+
+.crud-form-field label span {
+  color: design.$danger-color;
+}
+
+.field-error {
+  color: design.$danger-color;
+  font-size: design.$font-size-xs;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: design.$spacing-sm;
+  flex-wrap: wrap;
+}
+
+.delete-dialog-body {
+  display: grid;
+  gap: design.$spacing-lg;
+}
+
+.delete-dialog-body p {
+  margin: 0;
+  color: design.$text-primary;
+}
+
+.missing-resource {
+  padding: 2rem;
+}
+
+@media (max-width: 768px) {
+  .actions-cell,
+  .dialog-actions {
+    justify-content: stretch;
+  }
+
+  .actions-cell .action-btn,
+  .dialog-actions .btn {
+    width: 100%;
+  }
+}

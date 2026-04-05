@@ -8,17 +8,13 @@
 >
   <c-sidebar-header class="border-bottom">
     <c-sidebar-brand [routerLink]="[]">
-      <img src="assets/images/image.png" alt="Beon IT logo" class="sidebar-brand-full">
+      <img src="https://sidrahub.com/images/logo.png" alt="SidraHub logo" class="sidebar-brand-full">
     </c-sidebar-brand>
   </c-sidebar-header>
 
   <ng-scrollbar pointerEventsMethod="scrollbar" visibility="hover">
     <c-sidebar-nav [navItems]="navItems" dropdownMode="path" compact />
   </ng-scrollbar>
-
-  <c-sidebar-footer *ngIf="!sidebar1.narrow" cSidebarToggle="sidebar1" class="border-top d-none d-lg-flex" toggle="unfoldable" style="cursor: pointer;">
-    <button cSidebarToggler aria-label="Toggle sidebar fold"></button>
-  </c-sidebar-footer>
 </c-sidebar>
 
 <!-- Main wrapper -->
