@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 
+import { AuthService } from '../../../auth/auth.service';
 import { LandingLocaleService } from '../landing-locale.service';
 
 interface Language {
@@ -28,6 +29,7 @@ interface Language {
 export class LandingNavbarComponent implements OnDestroy {
   readonly locale = inject(LandingLocaleService);
   private readonly router = inject(Router);
+  private readonly authService = inject(AuthService);
   private closeTimer: ReturnType<typeof setTimeout> | null = null;
   readonly languages: Language[] = [
     { code: 'ar', label: 'العربية', flagUrl: 'https://flagcdn.com/w40/sa.png', dir: 'rtl' },
@@ -37,6 +39,7 @@ export class LandingNavbarComponent implements OnDestroy {
     () => this.languages.find((lang) => lang.code === this.locale.locale()) ?? this.languages[0]
   );
   readonly isLangDropdownOpen = signal(false);
+  readonly isProfileDropdownOpen = signal(false);
   readonly isServicesDropdownOpen = signal(false);
   readonly isMobileMenuOpen = signal(false);
 
@@ -71,6 +74,38 @@ export class LandingNavbarComponent implements OnDestroy {
   closeMobileMenu(): void {
     this.isMobileMenuOpen.set(false);
     this.isServicesDropdownOpen.set(false);
+  }
+
+  isAuthenticated(): boolean {
+    return this.authService.isAuthenticated();
+  }
+
+  currentUserName(): string {
+    return this.authService.userName() || 'Profile';
+  }
+
+  currentUserInitial(): string {
+    return this.currentUserName().trim().charAt(0).toUpperCase() || 'P';
+  }
+
+  goToProfile(event?: MouseEvent): void {
+    event?.preventDefault();
+    this.isProfileDropdownOpen.set(false);
+    this.router.navigateByUrl(this.authService.getPostLoginRoute());
+    this.closeMobileMenu();
+  }
+
+  logout(event?: MouseEvent): void {
+    event?.preventDefault();
+    this.isProfileDropdownOpen.set(false);
+    this.closeMobileMenu();
+    this.authService.logout();
+  }
+
+  toggleProfileDropdown(event?: MouseEvent): void {
+    event?.preventDefault();
+    event?.stopPropagation();
+    this.isProfileDropdownOpen.update((value) => !value);
   }
 
   goToAbout(event?: MouseEvent): void {
@@ -114,6 +149,9 @@ export class LandingNavbarComponent implements OnDestroy {
     const target = event.target as HTMLElement | null;
     if (!target?.closest('.lang-switcher')) {
       this.isLangDropdownOpen.set(false);
+    }
+    if (!target?.closest('.profile-switcher')) {
+      this.isProfileDropdownOpen.set(false);
     }
     if (!target?.closest('.nav-container')) {
       this.isMobileMenuOpen.set(false);

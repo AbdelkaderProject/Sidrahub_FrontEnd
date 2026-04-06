@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 import { IconDirective } from '@coreui/icons-angular';
 import {
@@ -28,6 +28,7 @@ import { AuthService } from '../../../auth/auth.service';
   imports: [
     CommonModule,
     FormsModule,
+    RouterLink,
     ContainerComponent,
     RowComponent,
     ColComponent,
@@ -53,6 +54,7 @@ export class LoginComponent implements OnInit {
     rememberMe: false
   };
 
+  showPassword = false;
   isLoading = false;
   errorMessage = '';
   successMessage = '';
@@ -64,7 +66,7 @@ export class LoginComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.authService.isAuthenticated()) {
-      this.router.navigate(['/dashboard'], { replaceUrl: true });
+      this.router.navigateByUrl(this.authService.getPostLoginRoute(), { replaceUrl: true });
     }
   }
 
@@ -84,7 +86,7 @@ export class LoginComponent implements OnInit {
         if (response.token) {
           this.successMessage = 'Login successful, redirecting...';
           setTimeout(() => {
-            this.router.navigate(['/dashboard'], { replaceUrl: true });
+            this.router.navigateByUrl(this.authService.getPostLoginRoute(), { replaceUrl: true });
           }, 300);
         } else {
           this.errorMessage = 'Login failed';
@@ -105,7 +107,12 @@ export class LoginComponent implements OnInit {
       password: '',
       rememberMe: false
     };
+    this.showPassword = false;
     this.errorMessage = '';
     this.successMessage = '';
+  }
+
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
   }
 }

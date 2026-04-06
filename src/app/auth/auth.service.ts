@@ -4,10 +4,17 @@ import { Router } from '@angular/router';
 import { Observable, catchError, map, tap, throwError } from 'rxjs';
 import { StorageService } from './storage.service';
 import { environment } from '../environments/environment';
-import { PermissionService } from '../services/permission.service';
 
 export interface LoginCredentials {
   email: string;
+  password: string;
+  rememberMe?: boolean;
+}
+
+export interface RegisterCredentials {
+  fullName: string;
+  email: string;
+  phoneNumber: string;
   password: string;
   rememberMe?: boolean;
 }
@@ -34,7 +41,6 @@ export interface LoginResponse extends ApiLoginResponse {
 })
 export class AuthService {
   private readonly apiUrl = `${environment.apiUrl}/Auth`;
-  private readonly permissionService = inject(PermissionService);
 
   constructor(
     private http: HttpClient,
@@ -62,32 +68,62 @@ export class AuthService {
             : response.userId
           : undefined;
 
+        const resolvedRole = this.resolvePrimaryRole(response);
+
         this.setSession(
           response.token,
           response.fullName || response.email || credentials.email,
-          response.roles?.[0] || 'User',
+          resolvedRole,
           userId,
           expiresAtMs,
           !!credentials.rememberMe
         );
 
-        if (response.permissions?.length) {
-          this.permissionService.setPermissions(response.permissions);
+        
+       
+      }),
+      catchError((error) => this.handleError(error))
+    );
+  }
+
+  register(credentials: RegisterCredentials): Observable<ApiLoginResponse> {
+    return this.http.post<ApiLoginResponse>(`${this.apiUrl}/register`, {
+      fullName: credentials.fullName,
+      email: credentials.email,
+      phoneNumber: credentials.phoneNumber,
+      password: credentials.password
+    }).pipe(
+      tap((response) => {
+        if (!response.token) {
           return;
         }
 
-        this.permissionService.refreshPermissions().subscribe({
-          error: (err) => {
-            console.warn('[AuthService] Failed to load permissions after login', err);
-          }
-        });
+        const parsedExpiry = response.expiresAtUtc ? Date.parse(response.expiresAtUtc) : NaN;
+        const expiresAtMs = Number.isNaN(parsedExpiry)
+          ? Date.now() + environment.security.tokenExpiry * 1000
+          : parsedExpiry;
+        const userId = response.userId
+          ? typeof response.userId === 'string'
+            ? parseInt(response.userId, 10)
+            : response.userId
+          : undefined;
+
+        const resolvedRole = this.resolvePrimaryRole(response);
+
+        this.setSession(
+          response.token,
+          response.fullName || response.email || credentials.email,
+          resolvedRole,
+          userId,
+          expiresAtMs,
+          !!credentials.rememberMe
+        );
       }),
       catchError((error) => this.handleError(error))
     );
   }
 
   logout(): void {
-    this.permissionService.clearPermissions();
     this.clearSession();
     this.router.navigate(['/pages/login']);
   }
@@ -106,7 +142,20 @@ export class AuthService {
   }
 
   role(): string | null {
-    return this.storageService.getRole();
+    const storedRole = this.storageService.getRole();
+    if (storedRole?.trim()) {
+      return storedRole;
+    }
+
+    return this.extractRoleFromToken(this.getToken());
+  }
+
+  isAdmin(): boolean {
+    return this.isAdminRoleValue(this.role());
+  }
+
+  getPostLoginRoute(): string {
+    return this.isAdmin() ? '/dashboard' : '/home';
   }
 
   private setSession(
@@ -121,6 +170,42 @@ export class AuthService {
     this.storageService.setUserInfo(username, role, userId, rememberMe);
   }
 
+  private resolvePrimaryRole(response: ApiLoginResponse): string {
+    const apiRoles = response.roles?.filter((role) => !!role?.trim()) ?? [];
+    if (apiRoles.length > 0) {
+      const prioritizedAdminRole = apiRoles.find((role) => this.isAdminRoleValue(role));
+      return prioritizedAdminRole ?? apiRoles[0];
+    }
+
+    return this.extractRoleFromToken(response.token) || 'User';
+  }
+
+  private extractRoleFromToken(token: string | null): string | null {
+    if (!token) {
+      return null;
+    }
+
+    const payload = this.parseJwtPayload(token);
+    if (!payload) {
+      return null;
+    }
+
+    const roleClaim = payload['role']
+      ?? payload['roles']
+      ?? payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+
+    if (Array.isArray(roleClaim)) {
+      const firstRole = roleClaim.find((role) => typeof role === 'string' && role.trim().length > 0);
+      return typeof firstRole === 'string' ? firstRole : null;
+    }
+
+    if (typeof roleClaim === 'string' && roleClaim.trim().length > 0) {
+      return roleClaim;
+    }
+
+    return null;
+  }
+
   private clearSession(): void {
     this.storageService.clear();
   }
@@ -131,14 +216,50 @@ export class AuthService {
       return Date.now() >= storedExpiry;
     }
 
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      const expiry = payload.exp;
-      const currentTime = Math.floor(Date.now() / 1000);
-      return currentTime >= expiry;
-    } catch {
+    const payload = this.parseJwtPayload(token);
+    if (!payload) {
       return false;
     }
+
+    const expiry = typeof payload['exp'] === 'number' ? payload['exp'] : Number(payload['exp']);
+    if (Number.isNaN(expiry)) {
+      return false;
+    }
+
+    const currentTime = Math.floor(Date.now() / 1000);
+    return currentTime >= expiry;
+  }
+
+  private parseJwtPayload(token: string): Record<string, unknown> | null {
+    const tokenParts = token.split('.');
+    if (tokenParts.length < 2) {
+      return null;
+    }
+
+    const base64Url = tokenParts[1];
+    const base64 = base64Url
+      .replace(/-/g, '+')
+      .replace(/_/g, '/')
+      .padEnd(Math.ceil(base64Url.length / 4) * 4, '=');
+
+    try {
+      return JSON.parse(atob(base64)) as Record<string, unknown>;
+    } catch {
+      return null;
+    }
+  }
+
+  private isAdminRoleValue(role: string | null | undefined): boolean {
+    const normalizedRole = (role || '')
+      .trim()
+      .toLowerCase()
+      .replace(/[_-]+/g, '')
+      .replace(/\s+/g, '');
+
+    return normalizedRole === 'admin'
+      || normalizedRole === 'administration'
+      || normalizedRole === 'systemadmin'
+      || normalizedRole === 'systemadministrator';
   }
 
   private handleError(error: HttpErrorResponse): Observable<never> {

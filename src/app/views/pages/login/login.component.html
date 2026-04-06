@@ -18,9 +18,7 @@
 
             <form (ngSubmit)="onSubmit()" cForm class="login-form">
               <div class="text-center mb-4">
-                <img class="login-logo" src="assets/images/image.png" alt="Business platform logo">
-                <h1 class="login-title">Business Platform Login</h1>
-                <p class="login-subtitle">Access all business services from one place</p>
+                <img class="login-logo" src="https://sidrahub.com/images/logo.png" alt="SidraHub logo">
               </div>
 
               <div class="mb-3">
@@ -50,7 +48,7 @@
                     <svg cIcon name="cil-lock-locked"></svg>
                   </span>
                   <input
-                    type="password"
+                    [type]="showPassword ? 'text' : 'password'"
                     cFormControl
                     class="form-input"
                     placeholder="Password"
@@ -60,6 +58,27 @@
                     required
                     autocomplete="current-password"
                   />
+                  <button
+                    type="button"
+                    class="password-toggle"
+                    [disabled]="isLoading"
+                    (click)="togglePasswordVisibility()"
+                    [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+                  >
+                    @if (showPassword) {
+                      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M3 3l18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M10.6 10.6a2 2 0 102.8 2.8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M9.36 5.56A10.94 10.94 0 0112 5c5.05 0 9.27 3.11 10.5 7- .52 1.03-1.2 1.97-2.02 2.8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M6.23 6.23C4.17 7.42 2.61 9.08 1.5 12c.9 2.35 2.76 4.33 5.1 5.57A10.76 10.76 0 0012 19c1.61 0 3.14-.33 4.53-.92" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    } @else {
+                      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M1.5 12S5.5 5 12 5s10.5 7 10.5 7-4 7-10.5 7S1.5 12 1.5 12z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+                      </svg>
+                    }
+                  </button>
                 </c-input-group>
               </div>
 
@@ -90,6 +109,11 @@
                   Loading...
                 </span>
               </button>
+
+              <p class="auth-switch text-center mt-4 mb-0">
+                Don't have an account?
+                <a routerLink="/pages/register">Create one</a>
+              </p>
             </form>
           </c-card-body>
         </c-card>

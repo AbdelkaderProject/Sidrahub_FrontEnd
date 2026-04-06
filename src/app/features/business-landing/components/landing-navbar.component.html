@@ -152,16 +152,94 @@
         </div>
       </li>
       <li class="nav-item nav-item--mobile-cta">
-        <a routerLink="/pages/login" class="btn btn-primary" (click)="closeMobileMenu()">
-          {{ locale.t('login') }}
-          <i data-lucide="user" style="width: 16px"></i>
-        </a>
+        @if (isAuthenticated()) {
+          <div class="profile-switcher">
+            <button
+              type="button"
+              class="profile-trigger"
+              [attr.aria-expanded]="isProfileDropdownOpen()"
+              (click)="toggleProfileDropdown($event)"
+            >
+              <span class="profile-trigger__avatar">{{ currentUserInitial() }}</span>
+              <span class="profile-trigger__name">{{ currentUserName() }}</span>
+              <i
+                data-lucide="chevron-down"
+                class="chevron-icon"
+                [class.rotated]="isProfileDropdownOpen()"
+              ></i>
+            </button>
+
+            @if (isProfileDropdownOpen()) {
+              <div class="profile-dropdown">
+                <div class="profile-dropdown__header">
+                  <div class="profile-dropdown__avatar">{{ currentUserInitial() }}</div>
+                  <div>
+                    <div class="profile-dropdown__name">{{ currentUserName() }}</div>
+                    <div class="profile-dropdown__subtitle">Signed in</div>
+                  </div>
+                </div>
+                <a href="#" class="profile-dropdown__action" (click)="goToProfile($event)">
+                  <i data-lucide="user-round"></i>
+                  <span>View profile</span>
+                </a>
+                <a href="#" class="profile-dropdown__action profile-dropdown__action--danger" (click)="logout($event)">
+                  <i data-lucide="log-out"></i>
+                  <span>Logout</span>
+                </a>
+              </div>
+            }
+          </div>
+        } @else {
+          <a routerLink="/pages/login" class="btn btn-primary" (click)="closeMobileMenu()">
+            {{ locale.t('login') }}
+            <i data-lucide="user" style="width: 16px"></i>
+          </a>
+        }
       </li>
     </ul>
 
-    <a routerLink="/pages/login" class="btn btn-primary">
-      {{ locale.t('login') }}
-      <i data-lucide="user" style="width: 16px"></i>
-    </a>
+    @if (isAuthenticated()) {
+      <div class="profile-switcher">
+        <button
+          type="button"
+          class="profile-trigger"
+          [attr.aria-expanded]="isProfileDropdownOpen()"
+          (click)="toggleProfileDropdown($event)"
+        >
+          <span class="profile-trigger__avatar">{{ currentUserInitial() }}</span>
+          <span class="profile-trigger__name">{{ currentUserName() }}</span>
+          <i
+            data-lucide="chevron-down"
+            class="chevron-icon"
+            [class.rotated]="isProfileDropdownOpen()"
+          ></i>
+        </button>
+
+        @if (isProfileDropdownOpen()) {
+          <div class="profile-dropdown">
+            <div class="profile-dropdown__header">
+              <div class="profile-dropdown__avatar">{{ currentUserInitial() }}</div>
+              <div>
+                <div class="profile-dropdown__name">{{ currentUserName() }}</div>
+                <div class="profile-dropdown__subtitle">Signed in</div>
+              </div>
+            </div>
+            <a href="#" class="profile-dropdown__action" (click)="goToProfile($event)">
+              <i data-lucide="user-round"></i>
+              <span>View profile</span>
+            </a>
+            <a href="#" class="profile-dropdown__action profile-dropdown__action--danger" (click)="logout($event)">
+              <i data-lucide="log-out"></i>
+              <span>Logout</span>
+            </a>
+          </div>
+        }
+      </div>
+    } @else {
+      <a routerLink="/pages/login" class="btn btn-primary">
+        {{ locale.t('login') }}
+        <i data-lucide="user" style="width: 16px"></i>
+      </a>
+    }
   </div>
 </header>

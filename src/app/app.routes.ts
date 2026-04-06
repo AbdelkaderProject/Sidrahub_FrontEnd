@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './auth/auth.guard';
+import { dashboardGuard } from './auth/dashboard.guard';
 import { loginGuard } from './auth/login.guard';
 import { PublicLayoutComponent } from './shared/layouts/public-layout.component';
 import { AboutComponent } from './views/pages/about/about.component';
@@ -108,7 +109,8 @@ export const routes: Routes = [
     children: [
       {
         path: 'dashboard',
-        loadComponent: () => import('./views/dashboard/dashboard.component').then(m => m.DashboardComponent)
+        loadComponent: () => import('./views/dashboard/dashboard.component').then(m => m.DashboardComponent),
+        canActivate: [dashboardGuard]
       },
       {
         path: 'services',
