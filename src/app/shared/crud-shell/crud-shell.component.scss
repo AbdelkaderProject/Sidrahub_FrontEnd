@@ -1,0 +1,113 @@
+@use "../../../scss/shared-design" as design;
+
+.crud-shell-page {
+  @include design.page-container;
+  display: grid;
+  gap: design.$spacing-xl;
+}
+
+.crud-shell-header {
+  gap: design.$spacing-lg;
+  flex-wrap: wrap;
+}
+
+.title-group {
+  display: grid;
+  gap: design.$spacing-sm;
+}
+
+.subtitle {
+  margin: 0;
+  color: design.$text-secondary;
+  font-size: design.$font-size-md;
+}
+
+.crud-create-button {
+  white-space: nowrap;
+}
+
+.crud-filters {
+  display: block;
+
+  &:empty {
+    display: none;
+  }
+}
+
+.crud-state-card {
+  min-height: 320px;
+}
+
+.crud-table-wrap {
+  overflow-x: auto;
+}
+
+:host ::ng-deep .table-card {
+  @include design.card-style;
+  overflow: hidden;
+}
+
+:host ::ng-deep .table-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: design.$spacing-md;
+  padding: design.$spacing-lg design.$spacing-xl;
+  border-bottom: 1px solid design.$border-color;
+  background:
+    linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.1) 100%),
+    design.$bg-white;
+}
+
+:host ::ng-deep .table-title {
+  display: flex;
+  align-items: center;
+  gap: design.$spacing-sm;
+  margin: 0;
+  color: design.$text-primary;
+  font-size: design.$font-size-lg;
+  font-weight: design.$font-weight-bold;
+}
+
+:host ::ng-deep .table-title i {
+  color: design.$primary-blue;
+}
+
+:host ::ng-deep .table-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: design.$spacing-sm;
+  flex-wrap: wrap;
+}
+
+:host ::ng-deep .crud-table-wrap .table {
+  margin-bottom: 0;
+}
+
+@media (max-width: 768px) {
+  .crud-shell-header {
+    align-items: stretch;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: stretch;
+    flex-wrap: wrap;
+  }
+
+  .crud-create-button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  :host ::ng-deep .table-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  :host ::ng-deep .table-actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+}

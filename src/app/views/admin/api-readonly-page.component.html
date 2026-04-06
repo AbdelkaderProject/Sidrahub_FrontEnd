@@ -1,0 +1,26 @@
+<app-crud-shell
+  [title]="title()"
+  [subtitle]="subtitle()"
+  [icon]="icon()"
+  [tableTitle]="title() + ' Overview'"
+  [tableIcon]="icon()"
+  [showCreateButton]="false"
+  [loading]="loading()"
+  [hasData]="cards().length > 0"
+  emptyTitle="No data available"
+  emptyMessage="This endpoint did not return any displayable data."
+>
+  <div crud-table class="readonly-grid">
+    <article class="readonly-card" *ngFor="let card of cards()">
+      <div class="readonly-card-head">
+        <div>
+          <h3>{{ card.title }}</h3>
+          <p>{{ card.description }}</p>
+        </div>
+        <a *ngIf="card.link" class="btn btn-primary readonly-link" [routerLink]="card.link">Open</a>
+      </div>
+
+      <pre *ngIf="card.data">{{ card.data | json }}</pre>
+    </article>
+  </div>
+</app-crud-shell>

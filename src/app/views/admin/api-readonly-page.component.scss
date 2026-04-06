@@ -1,0 +1,45 @@
+@use "../../../scss/shared-design" as design;
+
+.readonly-grid {
+  display: grid;
+  gap: design.$spacing-lg;
+}
+
+.readonly-card {
+  @include design.card-style;
+  padding: design.$spacing-xl;
+  display: grid;
+  gap: design.$spacing-lg;
+}
+
+.readonly-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: design.$spacing-md;
+  flex-wrap: wrap;
+}
+
+.readonly-card h3 {
+  margin: 0 0 6px;
+  color: design.$text-primary;
+}
+
+.readonly-card p {
+  margin: 0;
+  color: design.$text-secondary;
+}
+
+.readonly-card pre {
+  margin: 0;
+  padding: design.$spacing-lg;
+  border-radius: design.$border-radius-md;
+  background: #0f172a;
+  color: #e2e8f0;
+  overflow-x: auto;
+  font-size: 12px;
+}
+
+.readonly-link {
+  text-decoration: none;
+}

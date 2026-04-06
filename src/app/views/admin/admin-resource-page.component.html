@@ -1,0 +1,98 @@
+<ng-container *ngIf="config() as resource; else missingResource">
+  <app-crud-shell
+    [title]="resource.title"
+    [subtitle]="resource.subtitle"
+    [icon]="resource.icon"
+    [tableTitle]="resource.tableTitle"
+    [tableIcon]="resource.icon"
+    [createLabel]="resource.createLabel"
+    [loading]="loading()"
+    [hasData]="filteredItems().length > 0"
+    [emptyTitle]="resource.emptyTitle"
+    [emptyMessage]="resource.emptyMessage"
+    (create)="openCreateDialog()"
+  >
+    <div crud-filters class="crud-filters-card">
+      <label class="search-box">
+        <i class="pi pi-search"></i>
+        <input type="search" [value]="searchTerm()" (input)="onSearch(($any($event.target)).value)" placeholder="Search records..." />
+      </label>
+    </div>
+
+    <div table-actions>
+      <span class="records-count">{{ filteredItems().length }} record(s)</span>
+    </div>
+
+    <div crud-table>
+      <table class="table admin-table">
+        <thead>
+          <tr>
+            <th *ngFor="let column of resource.columns">{{ column.label || column.key }}</th>
+            <th class="actions-column">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of filteredItems()">
+            <td *ngFor="let column of resource.columns">
+              <ng-container [ngSwitch]="column.type">
+                <span *ngSwitchCase="'currency'">{{ getCurrencyValue(item, column.key) | currency:'USD':'symbol':'1.2-2' }}</span>
+                <span *ngSwitchDefault>{{ getCellValue(item, column.key) }}</span>
+              </ng-container>
+            </td>
+            <td class="actions-cell">
+              <button type="button" class="action-btn action-btn-edit" (click)="openEditDialog(item)">Edit</button>
+              <button type="button" class="action-btn action-btn-delete" (click)="openDeleteDialog(item)">Delete</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <app-dialog-shell crud-dialog [visible]="dialogVisible()" (visibleChange)="dialogVisible.set($event)" [header]="currentId() ? 'Edit ' + resource.title : 'Create ' + resource.title" [style]="{ width: 'min(960px, 96vw)' }" styleClass="crud-form-dialog">
+      <form class="crud-form-grid" [formGroup]="form" (ngSubmit)="save()">
+        <div class="crud-form-field" *ngFor="let field of resource.formFields; trackBy: trackByField">
+          <label [for]="field.key">
+            {{ field.label }}
+            <span *ngIf="field.required">*</span>
+          </label>
+
+          <ng-container [ngSwitch]="field.type">
+            <select *ngSwitchCase="'select'" [id]="field.key" [formControlName]="field.key">
+              <option value="">Select {{ field.label }}</option>
+              <option *ngFor="let option of fieldOptions(field)" [value]="option.value">{{ option.label }}</option>
+            </select>
+
+            <textarea *ngSwitchCase="'textarea'" [id]="field.key" [rows]="field.rows || 4" [placeholder]="field.placeholder || ''" [formControlName]="field.key"></textarea>
+
+            <input *ngSwitchDefault [id]="field.key" [type]="field.type" [attr.min]="field.min ?? null" [attr.step]="field.step ?? null" [placeholder]="field.placeholder || ''" [formControlName]="field.key" />
+          </ng-container>
+
+          <small class="field-error" *ngIf="form.get(field.key)?.invalid && form.get(field.key)?.touched">{{ field.label }} is required.</small>
+        </div>
+
+        <div class="dialog-actions">
+          <button type="button" class="btn btn-secondary" (click)="closeFormDialog()">Cancel</button>
+          <button type="submit" class="btn btn-primary" [disabled]="saving()">{{ saving() ? 'Saving...' : currentId() ? 'Update' : 'Create' }}</button>
+        </div>
+      </form>
+    </app-dialog-shell>
+
+    <app-dialog-shell crud-dialog [visible]="deleteDialogVisible()" (visibleChange)="deleteDialogVisible.set($event)" header="Delete Record" [style]="{ width: 'min(420px, 92vw)' }" styleClass="crud-delete-dialog">
+      <div class="delete-dialog-body">
+        <p>Are you sure you want to delete <strong>{{ selectedItemLabel() }}</strong>?</p>
+        <div class="dialog-actions">
+          <button type="button" class="btn btn-secondary" (click)="closeDeleteDialog()">Cancel</button>
+          <button type="button" class="btn btn-danger" [disabled]="saving()" (click)="confirmDelete()">{{ saving() ? 'Deleting...' : 'Delete' }}</button>
+        </div>
+      </div>
+    </app-dialog-shell>
+  </app-crud-shell>
+</ng-container>
+
+<ng-template #missingResource>
+  <section class="missing-resource">
+    <h2>Resource not found</h2>
+    <p>The requested admin resource is not configured.</p>
+    <a routerLink="/dashboard">Back to dashboard</a>
+  </section>
+</ng-template>
