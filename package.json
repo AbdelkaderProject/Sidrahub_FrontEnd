@@ -41,6 +41,7 @@
     "bootstrap": "^5.3.8",
     "chart.js": "^4.5.1",
     "lodash-es": "^4.17.21",
+    "lucide": "^1.7.0",
     "ngx-scrollbar": "^13.0.3",
     "primeflex": "^4.0.0",
     "primeicons": "^7.0.0",

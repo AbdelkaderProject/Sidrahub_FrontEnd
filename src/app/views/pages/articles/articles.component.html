@@ -1,0 +1,55 @@
+<section class="articles-hero">
+  <div class="articles-hero__overlay"></div>
+  <div class="articles-hero__content">
+    <h1>أخبارنا &amp; مقالات</h1>
+    <div class="breadcrumb">الرئيسية &gt; أخبارنا &amp; مقالات</div>
+  </div>
+</section>
+
+<section class="articles-section">
+  <div class="articles-container">
+    <aside class="articles-sidebar">
+      <h3>تصفية حسب</h3>
+      <div class="category-list">
+        <label class="category-item" *ngFor="let category of categories">
+          <input type="checkbox" />
+          <span>{{ category }}</span>
+        </label>
+      </div>
+    </aside>
+
+    <div class="articles-content">
+      <div class="articles-grid">
+        <article class="article-card" *ngFor="let article of articles">
+          <div class="article-image-wrap">
+            <img [src]="article.image" [alt]="article.title" />
+          </div>
+
+          <div class="article-topbar">
+            <span class="article-badge">{{ article.category }}</span>
+            <div class="article-meta">
+              <span class="article-type">مقال</span>
+              <span class="article-date">{{ article.date }}</span>
+            </div>
+          </div>
+
+          <h2>{{ article.title }}</h2>
+          <p>{{ article.description }}</p>
+
+          <a href="#" class="read-more">
+            <span>قراءة المزيد</span>
+            <span class="read-more__arrow">←</span>
+          </a>
+        </article>
+      </div>
+
+      <div class="pagination">
+        <a href="#" class="page-link">السابق</a>
+        <a href="#" class="page-number active">1</a>
+        <a href="#" class="page-number">2</a>
+        <a href="#" class="page-number">3</a>
+        <a href="#" class="page-link">التالي</a>
+      </div>
+    </div>
+  </div>
+</section>

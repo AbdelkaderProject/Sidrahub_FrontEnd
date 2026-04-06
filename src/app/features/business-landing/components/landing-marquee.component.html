@@ -1,0 +1,17 @@
+<section class="marquee-sec">
+  <div class="bl-container">
+    <h3 class="marquee-title">{{ locale.t('marqueeTitle') }}</h3>
+  </div>
+  <div class="marquee-container" id="marquee">
+    @for (row of [0, 1]; track row) {
+      <div class="logo-box">{{ locale.t('logoBox1') }}</div>
+      <div class="logo-box">{{ locale.t('logoBox2') }}</div>
+      <div class="logo-box">{{ locale.t('logoBox3') }}</div>
+      <div class="logo-box">{{ locale.t('logoBox4') }}</div>
+      <div class="logo-box">{{ locale.t('logoBox5') }}</div>
+      <div class="logo-box">{{ locale.t('logoBox6') }}</div>
+      <div class="logo-box">{{ locale.t('logoBox7') }}</div>
+      <div class="logo-box">{{ locale.t('logoBox8') }}</div>
+    }
+  </div>
+</section>

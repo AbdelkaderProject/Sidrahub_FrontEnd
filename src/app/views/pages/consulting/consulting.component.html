@@ -1,0 +1,219 @@
+<section class="consulting-hero">
+  <div class="consulting-hero__overlay"></div>
+  <div class="consulting-hero__content">
+    <div class="hero-line"></div>
+    <h1>استشارة مجانية</h1>
+    <div class="breadcrumb">الرئيسية &gt; استشارة مجانية</div>
+  </div>
+</section>
+
+<section class="consulting-section">
+  @if (currentStep() === 1) {
+    <div class="consulting-card">
+      <div class="consulting-image">
+        <img src="https://picsum.photos/760/960?random=39" alt="استشارة مجانية" />
+      </div>
+
+      <div class="consulting-form-panel">
+        <h2>احجز إستشارتك المجانية</h2>
+
+        <form class="consulting-form" [formGroup]="consultingForm" (ngSubmit)="goToSchedule()">
+          <div class="form-field">
+            <label for="name">الإسم</label>
+            <input id="name" type="text" formControlName="name" placeholder="الإسم كامل" />
+            <div class="field-error" *ngIf="hasError('name')">هذا الحقل مطلوب</div>
+          </div>
+
+          <div class="form-field">
+            <label for="phone">رقم الجوال</label>
+
+            <div class="phone-row">
+              <div class="country-select" [class.open]="isCountryDropdownOpen()">
+                <button type="button" class="country-trigger" (click)="toggleCountryDropdown()">
+                  <img [src]="selectedCountry().flagUrl" [alt]="selectedCountry().name" class="country-flag" />
+                  <span class="country-code">{{ selectedCountry().code }}</span>
+                  <span class="country-chevron">▾</span>
+                </button>
+
+                @if (isCountryDropdownOpen()) {
+                  <div class="country-menu">
+                    <button
+                      *ngFor="let country of countries"
+                      type="button"
+                      class="country-option"
+                      (click)="selectCountry(country)"
+                    >
+                      <img [src]="country.flagUrl" [alt]="country.name" class="country-flag" />
+                      <span class="country-name">{{ country.name }}</span>
+                      <span class="country-code">{{ country.code }}</span>
+                    </button>
+                  </div>
+                }
+              </div>
+
+              <input id="phone" type="tel" formControlName="phone" placeholder="رقم الجوال" class="phone-input" />
+            </div>
+
+            <div class="field-error" *ngIf="hasError('phone')">هذا الحقل مطلوب</div>
+          </div>
+
+          <div class="form-field">
+            <label for="email">البريد الإلكتروني</label>
+            <input id="email" type="email" formControlName="email" placeholder="البريد الإلكتروني" />
+            <div class="field-error" *ngIf="hasError('email')">يرجى إدخال بريد إلكتروني صحيح</div>
+          </div>
+
+          <div class="form-field">
+            <label for="service">الخدمة</label>
+            <div class="select-wrap">
+              <select id="service" formControlName="service">
+                <option *ngFor="let service of services" [value]="service.value" [disabled]="service.value === ''">
+                  {{ service.label }}
+                </option>
+              </select>
+              <span class="select-chevron" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M6 9L12 15L18 9" />
+                </svg>
+              </span>
+            </div>
+            <div class="field-error" *ngIf="hasError('service')">هذا الحقل مطلوب</div>
+          </div>
+
+          <div class="form-field">
+            <label for="message">الوصف</label>
+            <textarea id="message" formControlName="message" placeholder="الوصف"></textarea>
+            <div class="field-error" *ngIf="hasError('message')">هذا الحقل مطلوب</div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="submit-btn">التالي</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  } @else {
+    <div class="booking-card">
+      <div class="booking-layout">
+        <aside class="booking-side booking-side--info">
+          <div class="booking-badge">اجتماع لمدة 30 دقيقة</div>
+          <h3 class="booking-title">{{ selectedServiceLabel() }}</h3>
+          <p class="booking-note">سيتم توفير رابط الاجتماع عبر البريد الإلكتروني بعد التأكيد.</p>
+
+          <div class="booking-detail">
+            <span class="booking-detail__label">العميل</span>
+            <span class="booking-detail__value">{{ consultingForm.controls.name.value }}</span>
+          </div>
+
+          <div class="booking-detail">
+            <span class="booking-detail__label">البريد الإلكتروني</span>
+            <span class="booking-detail__value">{{ consultingForm.controls.email.value }}</span>
+          </div>
+
+          <div class="booking-detail">
+            <span class="booking-detail__label">رقم الجوال</span>
+            <span class="booking-detail__value">{{ customerPhone() }}</span>
+          </div>
+
+          <div class="booking-detail">
+            <span class="booking-detail__label">المنطقة الزمنية</span>
+            <span class="booking-detail__value">Africa/Cairo</span>
+          </div>
+        </aside>
+
+        <section class="booking-calendar">
+          <div class="booking-calendar__header">
+            <div class="calendar-nav">
+              <button type="button" class="calendar-nav__btn">‹</button>
+              <button type="button" class="calendar-nav__btn">›</button>
+            </div>
+            <h3>أبريل 2026</h3>
+          </div>
+
+          <div class="calendar-weekdays">
+            <span *ngFor="let day of weekDays">{{ day }}</span>
+          </div>
+
+          <div class="calendar-grid">
+            <ng-container *ngFor="let row of calendarRows">
+              <ng-container *ngFor="let dayNumber of row">
+                @if (dayNumber === 0) {
+                  <span class="calendar-day calendar-day--empty"></span>
+                } @else {
+                  <button
+                    type="button"
+                    class="calendar-day"
+                    [class.calendar-day--active]="selectedDate().dayNumber === dayNumber"
+                    (click)="selectDate(getDay(dayNumber)!)"
+                  >
+                    {{ dayNumber }}
+                  </button>
+                }
+              </ng-container>
+            </ng-container>
+          </div>
+        </section>
+
+        <aside class="booking-side booking-side--slots">
+          <h3>الأوقات المتاحة</h3>
+          <div class="slot-date">
+            <button type="button" class="slot-date__chip slot-date__chip--active">{{ selectedDate().dayName }}</button>
+            <button type="button" class="slot-date__chip">{{ selectedDate().monthLabel }} {{ selectedDate().dayNumber }}</button>
+          </div>
+
+          <div class="slot-list">
+            <button
+              *ngFor="let slot of selectedDate().slots"
+              type="button"
+              class="slot-item"
+              [class.slot-item--active]="selectedTime() === slot"
+              (click)="selectTime(slot)"
+            >
+              {{ slot }}
+            </button>
+          </div>
+        </aside>
+      </div>
+
+      <div class="booking-actions">
+        <button type="button" class="booking-btn booking-btn--ghost" (click)="goBackToForm()">رجوع</button>
+        <button type="button" class="booking-btn" (click)="confirmBooking()">تأكيد</button>
+      </div>
+    </div>
+  }
+</section>
+
+@if (isConfirmationOpen()) {
+  <div class="booking-modal">
+    <div class="booking-modal__card">
+      <button type="button" class="booking-modal__close" (click)="closeConfirmation()">×</button>
+      <div class="booking-modal__icon">✓</div>
+      <div class="booking-modal__eyebrow">تم الحجز بنجاح</div>
+      <h3>{{ selectedServiceLabel() }}</h3>
+      <div class="booking-modal__meta">30 دقيقة</div>
+
+      <div class="booking-modal__summary">
+        <div class="booking-modal__row">
+          <span>الموعد</span>
+          <strong>{{ selectedDate().fullLabel }}</strong>
+        </div>
+        <div class="booking-modal__row">
+          <span>الوقت</span>
+          <strong>{{ selectedTime() }}</strong>
+        </div>
+        <div class="booking-modal__row">
+          <span>المنطقة الزمنية</span>
+          <strong>Africa/Cairo</strong>
+        </div>
+        <div class="booking-modal__row">
+          <span>البريد الإلكتروني</span>
+          <strong>{{ consultingForm.controls.email.value }}</strong>
+        </div>
+      </div>
+
+      <p class="booking-modal__message">تم إرسال تفاصيل الموعد ورابط الاجتماع إلى بريدك الإلكتروني، ويمكنك العودة أو تعديل البيانات لاحقًا.</p>
+
+      <button type="button" class="booking-btn booking-btn--full" (click)="finishBooking()">إنهاء</button>
+    </div>
+  </div>
+}

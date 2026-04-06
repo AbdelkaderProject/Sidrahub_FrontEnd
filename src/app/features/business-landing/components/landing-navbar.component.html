@@ -1,0 +1,167 @@
+<header class="header">
+  <div class="bl-container nav-container">
+    <div class="logo">
+      <i data-lucide="layers" class="logo-word1"></i>
+      <span class="logo-word1">{{ locale.t('logoW1') }}</span>
+      <span class="logo-word2">{{ locale.t('logoW2') }}</span>
+    </div>
+
+    <button type="button" class="menu-toggle" aria-label="Menu" (click)="toggleMobileMenu()">
+      @if (isMobileMenuOpen()) {
+        <i data-lucide="x"></i>
+      } @else {
+        <i data-lucide="menu"></i>
+      }
+    </button>
+
+    <ul class="nav-links" [class.mobile-open]="isMobileMenuOpen()">
+      <li class="nav-item">
+        <a href="/home" class="nav-link" (click)="goToHome($event)">{{ locale.t('navHome') }}</a>
+      </li>
+      <li
+        class="nav-item services-dropdown-item"
+        [class.open]="isServicesDropdownOpen()"
+        (mouseenter)="onMouseEnterDropdown()"
+        (mouseleave)="onMouseLeaveDropdown()"
+      >
+        <a href="#" class="nav-link" (mouseenter)="onMouseEnterDropdown()" (mouseleave)="onMouseLeaveDropdown()">
+          {{ locale.t('navServices') }}
+          <i data-lucide="chevron-down" style="width: 16px"></i>
+        </a>
+        <div class="mega-menu" (mouseenter)="onMouseEnterDropdown()" (mouseleave)="onMouseLeaveDropdown()">
+          <div class="mega-cats">
+            <div
+              class="mega-cat"
+              [class.active]="activeMega() === 'cat-company'"
+              (mouseenter)="setMega('cat-company')"
+              data-target="cat-company"
+            >
+              <div class="mega-cat__header">
+                <i data-lucide="chevron-down" class="mega-cat__chevron"></i>
+                <span>{{ locale.t('megaCatCompany') }}</span>
+              </div>
+              @if (activeMega() === 'cat-company') {
+                <div class="mega-inline-pane">
+                  <a href="/services/company-sa" class="mega-sublink">{{ locale.t('megaLinkCompanySa') }}</a>
+                  <a href="/services/company-dubai" class="mega-sublink">{{ locale.t('megaLinkCompanyDubai') }}</a>
+                </div>
+              }
+            </div>
+            <div
+              class="mega-cat"
+              [class.active]="activeMega() === 'cat-legal'"
+              (mouseenter)="setMega('cat-legal')"
+              data-target="cat-legal"
+            >
+              <div class="mega-cat__header">
+                <i data-lucide="chevron-down" class="mega-cat__chevron"></i>
+                <span>{{ locale.t('megaCatLegal') }}</span>
+              </div>
+              @if (activeMega() === 'cat-legal') {
+                <div class="mega-inline-pane">
+                  <a href="/services/legal-packages" class="mega-sublink">{{ locale.t('megaLinkLegal') }}</a>
+                </div>
+              }
+            </div>
+            <div
+              class="mega-cat"
+              [class.active]="activeMega() === 'cat-financial'"
+              (mouseenter)="setMega('cat-financial')"
+              data-target="cat-financial"
+            >
+              <div class="mega-cat__header">
+                <i data-lucide="chevron-down" class="mega-cat__chevron"></i>
+                <span>{{ locale.t('megaCatFinancial') }}</span>
+              </div>
+              @if (activeMega() === 'cat-financial') {
+                <div class="mega-inline-pane">
+                  <a href="/services/tax" class="mega-sublink">{{ locale.t('megaLinkTax') }}</a>
+                  <a href="/services/bookkeeping" class="mega-sublink">{{ locale.t('megaLinkBook') }}</a>
+                  <a href="/services/vat" class="mega-sublink">{{ locale.t('megaLinkVat') }}</a>
+                  <a href="/services/tax-report" class="mega-sublink">{{ locale.t('megaLinkTaxReport') }}</a>
+                </div>
+              }
+            </div>
+            <div
+              class="mega-cat"
+              [class.active]="activeMega() === 'cat-solutions'"
+              (mouseenter)="setMega('cat-solutions')"
+              data-target="cat-solutions"
+            >
+              <div class="mega-cat__header">
+                <i data-lucide="chevron-down" class="mega-cat__chevron"></i>
+                <span>{{ locale.t('megaCatSolutions') }}</span>
+              </div>
+              @if (activeMega() === 'cat-solutions') {
+                <div class="mega-inline-pane">
+                  <a href="/services/coworking" class="mega-sublink">{{ locale.t('megaLinkCoworking') }}</a>
+                  <a href="/services/hr" class="mega-sublink">{{ locale.t('megaLinkHr') }}</a>
+                  <a href="/services/trademark" class="mega-sublink">{{ locale.t('megaLinkTrademark') }}</a>
+                  <a href="/services/residency" class="mega-sublink">{{ locale.t('megaLinkResidency') }}</a>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      </li>
+      <li class="nav-item">
+        <a href="/blog" class="nav-link" (click)="goToArticles($event)">{{ locale.t('navBlog') }}</a>
+      </li>
+      <li class="nav-item">
+        <a href="/about-us" class="nav-link" (click)="goToAbout($event)">{{ locale.t('navAbout') }}</a>
+      </li>
+      <li class="nav-item">
+        <a href="/contact-us" class="nav-link" (click)="goToContact($event)">
+          {{ locale.t('navContact') }}
+          <i data-lucide="chevron-down" style="width: 16px"></i>
+        </a>
+      </li>
+      <li class="nav-item lang-dropdown-item">
+        <div class="lang-switcher">
+          <button
+            type="button"
+            class="lang-trigger"
+            [attr.aria-label]="locale.t('ariaLang')"
+            [attr.aria-expanded]="isLangDropdownOpen()"
+            (click)="toggleLangDropdown($event)"
+          >
+            <img
+              class="flag-img"
+              [src]="currentLang().flagUrl"
+              [alt]="currentLang().label"
+            />
+            <i
+              data-lucide="chevron-down"
+              class="chevron-icon"
+              [class.rotated]="isLangDropdownOpen()"
+            ></i>
+          </button>
+
+          @if (isLangDropdownOpen()) {
+            <div class="lang-dropdown">
+              @for (lang of languages; track lang.code) {
+                @if (lang.code !== currentLang().code) {
+                  <button type="button" class="lang-option" (click)="selectLanguage(lang)">
+                    <img class="flag-img" [src]="lang.flagUrl" [alt]="lang.label" />
+                    <span class="option-label">{{ lang.label }}</span>
+                  </button>
+                }
+              }
+            </div>
+          }
+        </div>
+      </li>
+      <li class="nav-item nav-item--mobile-cta">
+        <a routerLink="/pages/login" class="btn btn-primary" (click)="closeMobileMenu()">
+          {{ locale.t('login') }}
+          <i data-lucide="user" style="width: 16px"></i>
+        </a>
+      </li>
+    </ul>
+
+    <a routerLink="/pages/login" class="btn btn-primary">
+      {{ locale.t('login') }}
+      <i data-lucide="user" style="width: 16px"></i>
+    </a>
+  </div>
+</header>

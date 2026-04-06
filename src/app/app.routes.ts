@@ -1,16 +1,99 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './auth/auth.guard';
 import { loginGuard } from './auth/login.guard';
+import { PublicLayoutComponent } from './shared/layouts/public-layout.component';
+import { AboutComponent } from './views/pages/about/about.component';
+import { ArticlesComponent } from './views/pages/articles/articles.component';
+import { ConsultingComponent } from './views/pages/consulting/consulting.component';
+import { HomeComponent } from './views/pages/home/home.component';
+import { ContactComponent } from './views/pages/contact/contact.component';
 
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'home',
-    pathMatch: 'full'
+    component: PublicLayoutComponent,
+    children: [
+      {
+        path: '',
+        redirectTo: 'home',
+        pathMatch: 'full'
+      },
+      {
+        path: 'home',
+        component: HomeComponent
+      },
+      {
+        path: 'contact',
+        component: ContactComponent
+      },
+      {
+        path: 'contact-us',
+        component: ContactComponent
+      },
+      {
+        path: 'about',
+        component: AboutComponent
+      },
+      {
+        path: 'about-us',
+        component: AboutComponent
+      },
+      {
+        path: 'articles',
+        component: ArticlesComponent
+      },
+      {
+        path: 'blog',
+        component: ArticlesComponent
+      },
+      {
+        path: 'booking/consulting',
+        component: ConsultingComponent
+      }
+    ]
   },
   {
-    path: 'home',
-    loadComponent: () => import('./views/pages/home/home.component').then(m => m.HomeComponent)
+    path: 'ar',
+    component: PublicLayoutComponent,
+    children: [
+      {
+        path: '',
+        redirectTo: 'home',
+        pathMatch: 'full'
+      },
+      {
+        path: 'home',
+        component: HomeComponent
+      },
+      {
+        path: 'contact',
+        component: ContactComponent
+      },
+      {
+        path: 'contact-us',
+        component: ContactComponent
+      },
+      {
+        path: 'about',
+        component: AboutComponent
+      },
+      {
+        path: 'about-us',
+        component: AboutComponent
+      },
+      {
+        path: 'articles',
+        component: ArticlesComponent
+      },
+      {
+        path: 'blog',
+        component: ArticlesComponent
+      },
+      {
+        path: 'booking/consulting',
+        component: ConsultingComponent
+      }
+    ]
   },
   {
     path: 'pages',

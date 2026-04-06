@@ -1,13 +1,12 @@
-import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+
+import { BusinessLandingPageComponent } from '../../../features/business-landing/business-landing-page.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterLink],
-  templateUrl: './home.component.html',
-  styleUrl: './home.component.scss'
+  imports: [BusinessLandingPageComponent],
+  template: '<app-business-landing-page />',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HomeComponent {}
-

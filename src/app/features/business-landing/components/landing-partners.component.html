@@ -1,0 +1,29 @@
+<section class="partners-section">
+  <div class="container">
+    <div class="section-heading">
+      <div class="divider-line"></div>
+      <h2>{{ locale.t('partnersTitle') }}</h2>
+    </div>
+
+    <div class="partners-row" dir="ltr">
+      @for (partner of partners; track partner.src) {
+        <div class="partner-item">
+          @if (!hasImageError(partner.src)) {
+            <img
+              class="partner-logo"
+              [src]="partner.src"
+              [alt]="partner.alt"
+              loading="lazy"
+              decoding="async"
+              (error)="onImageError(partner.src)" />
+          } @else {
+            <div class="partner-item partner-badge">
+              <div class="badge-en">{{ partner.badgeEn }}</div>
+              <div class="badge-ar">{{ partner.badgeAr }}</div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</section>

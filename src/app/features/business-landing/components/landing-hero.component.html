@@ -1,0 +1,63 @@
+<section
+  class="hero"
+  id="hero"
+  (mouseenter)="setHeroPaused(true)"
+  (mouseleave)="setHeroPaused(false)"
+>
+  <div class="slider-controls">
+    <button type="button" class="slider-arrow arrow-next" (click)="nextSlide()" aria-label="Next">
+      <i data-lucide="chevron-left"></i>
+    </button>
+    <button type="button" class="slider-arrow arrow-prev" (click)="prevSlide()" aria-label="Previous">
+      <i data-lucide="chevron-right"></i>
+    </button>
+    <div class="slider-dots">
+      <div
+        class="dot"
+        [class.active]="currentSlide() === 0"
+        (click)="goToSlide(0)"
+        data-index="0"
+      ></div>
+      <div
+        class="dot"
+        [class.active]="currentSlide() === 1"
+        (click)="goToSlide(1)"
+        data-index="1"
+      ></div>
+    </div>
+  </div>
+
+  <div class="slide" [class.active]="currentSlide() === 0">
+    <div class="slide-content-wrap">
+      <div class="slide-text">
+        <h1>{{ locale.t('heroTitle') }}</h1>
+        <p>{{ locale.t('heroP1') }}</p>
+        <div class="hero-btns">
+          <a routerLink="/booking/consulting" class="btn btn-primary">{{ locale.t('consultFree') }}</a>
+          <a routerLink="/pages/login" class="btn btn-outline">{{ locale.t('ourServices') }}</a>
+        </div>
+      </div>
+      <div class="slide-image">
+        <div class="slide-stripe"></div>
+        <img src="https://picsum.photos/800/600?random=1" alt="" />
+      </div>
+    </div>
+  </div>
+
+  <div class="slide" [class.active]="currentSlide() === 1">
+    <div class="slide-content-wrap">
+      <div class="slide-text">
+        <h1>{{ locale.t('heroTitle') }}</h1>
+        <p>{{ locale.t('heroP2') }}</p>
+        <div class="hero-btns">
+          <a routerLink="/booking/consulting" class="btn btn-primary">{{ locale.t('consultFree') }}</a>
+          <a routerLink="/pages/login" class="btn btn-outline">{{ locale.t('ourServices') }}</a>
+        </div>
+      </div>
+      <div class="slide-image">
+        <div class="slide-stripe"></div>
+        <img src="https://picsum.photos/800/600?random=2" alt="" />
+      </div>
+    </div>
+  </div>
+</section>
