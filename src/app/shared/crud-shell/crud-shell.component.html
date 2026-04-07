@@ -5,7 +5,6 @@
         <i *ngIf="icon" [class]="icon"></i>
         <span>{{ title }}</span>
       </h1>
-      <p *ngIf="subtitle" class="subtitle">{{ subtitle }}</p>
       <ng-content select="[crud-header-meta]"></ng-content>
     </div>
 

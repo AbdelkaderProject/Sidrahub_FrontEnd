@@ -1,20 +1,5 @@
 @use "../../../scss/shared-design" as design;
 
-.crud-filters-card {
-  @include design.card-style;
-  padding: design.$spacing-lg;
-}
-
-.search-box {
-  display: flex;
-  align-items: center;
-  gap: design.$spacing-sm;
-}
-
-.search-box i {
-  color: design.$text-secondary;
-}
-
 .records-count {
   color: design.$text-secondary;
   font-size: design.$font-size-sm;
@@ -40,7 +25,7 @@
 
 .actions-column {
   width: 1%;
-  min-width: 150px;
+  min-width: 220px;
   white-space: nowrap;
   text-align: right;
 }
@@ -57,6 +42,17 @@
 
 .admin-table tbody td {
   vertical-align: top;
+}
+
+.table-image-preview {
+  width: 60px;
+  height: 60px;
+  display: block;
+  object-fit: cover;
+  border-radius: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+  background: #f8fafc;
 }
 
 .action-btn {
@@ -76,6 +72,31 @@
 .action-btn-edit {
   background: rgba(59, 130, 246, 0.12);
   color: design.$primary-blue-dark;
+}
+
+.action-icon-btn {
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: design.$border-radius-sm;
+  cursor: pointer;
+  transition: transform design.$transition-fast, opacity design.$transition-fast;
+}
+
+.action-icon-btn:hover {
+  transform: translateY(-1px);
+}
+
+.action-icon-btn i {
+  font-size: 1rem;
+}
+
+.action-btn-packages {
+  background: rgba(16, 185, 129, 0.14);
+  color: #047857;
 }
 
 .action-btn-delete {
@@ -103,6 +124,74 @@
   color: design.$danger-color;
 }
 
+.file-upload-field {
+  display: grid;
+  gap: 10px;
+}
+
+.file-upload-input {
+  min-height: 54px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px dashed rgba(15, 118, 110, 0.35);
+  background: linear-gradient(180deg, rgba(240, 253, 250, 0.9) 0%, rgba(248, 250, 252, 0.95) 100%);
+  color: #0f172a;
+}
+
+.file-upload-input::file-selector-button {
+  margin-right: 12px;
+  border: 0;
+  border-radius: 12px;
+  padding: 10px 14px;
+  background: linear-gradient(135deg, #0f766e 0%, #10b981 100%);
+  color: #ffffff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.file-upload-meta {
+  display: grid;
+  gap: 2px;
+  color: #64748b;
+  font-size: 0.82rem;
+}
+
+.file-upload-meta span {
+  color: #334155;
+  font-weight: 600;
+}
+
+.file-preview-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 12px;
+  border-radius: 18px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: #ffffff;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+}
+
+.file-preview-image {
+  width: 88px;
+  height: 88px;
+  object-fit: cover;
+  border-radius: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: #f8fafc;
+}
+
+.file-remove-btn {
+  border: 0;
+  border-radius: 12px;
+  padding: 10px 14px;
+  background: rgba(239, 68, 68, 0.12);
+  color: #dc2626;
+  font-weight: 700;
+  cursor: pointer;
+}
+
 .field-error {
   color: design.$danger-color;
   font-size: design.$font-size-xs;
@@ -125,18 +214,237 @@
   color: design.$text-primary;
 }
 
+.packages-dialog {
+  display: grid;
+  gap: 22px;
+}
+
+.packages-dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: design.$spacing-md;
+  padding: 6px 6px 0;
+}
+
+.packages-dialog-header h3,
+.packages-dialog-header p {
+  margin: 0;
+}
+
+.packages-dialog-header h3 {
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.2;
+}
+
+.packages-dialog-header p {
+  color: #64748b;
+  margin-top: 8px;
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.package-reset-btn {
+  white-space: nowrap;
+  min-height: 48px;
+  padding: 0 22px;
+  border-radius: 16px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: #ffffff;
+  color: #334155;
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+}
+
+.package-reset-btn:hover {
+  background: #f8fafc;
+}
+
+.package-form-card {
+  padding: 22px 22px 20px;
+  border-radius: 26px;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99) 0%, rgba(246, 250, 255, 0.98) 100%);
+  box-shadow: 0 18px 42px rgba(15, 23, 42, 0.08);
+  position: relative;
+}
+
+.package-form-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(45, 212, 191, 0.14), rgba(99, 102, 241, 0.1));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.package-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 22px;
+}
+
+.package-form-card .crud-form-field {
+  gap: 10px;
+}
+
+.package-form-card .crud-form-field label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #475569;
+  padding-left: 4px;
+}
+
+.package-form-card .crud-form-field input {
+  min-height: 60px;
+  border-radius: 20px;
+  border: 1px solid rgba(203, 213, 225, 0.9);
+  background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+  padding: 0 20px;
+  font-size: 1rem;
+  color: #0f172a;
+  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.03);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.package-form-card .crud-form-field input::placeholder {
+  color: #94a3b8;
+  font-size: 0.98rem;
+}
+
+.package-form-card .crud-form-field input:focus {
+  outline: none;
+  background: #ffffff;
+  border-color: rgba(59, 130, 246, 0.45);
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+  transform: translateY(-1px);
+}
+
+.packages-table-wrap {
+  overflow-x: auto;
+  border-radius: 20px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: #fff;
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.05);
+}
+
+.packages-table {
+  margin-bottom: 0;
+}
+
+.packages-table thead th {
+  padding: 16px 18px;
+  font-size: 0.82rem;
+  background: #f8fafc;
+}
+
+.packages-table tbody td {
+  padding: 18px;
+  font-size: 0.98rem;
+  vertical-align: middle;
+}
+
+.packages-table tbody tr:not(:last-child) td {
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.packages-table .actions-cell {
+  align-items: center;
+}
+
+.packages-table .action-btn {
+  min-width: 74px;
+  min-height: 44px;
+  border-radius: 14px;
+}
+
+.packages-empty-state {
+  text-align: center !important;
+  color: design.$text-secondary;
+  padding: 24px !important;
+}
+
+:host ::ng-deep .crud-packages-dialog.p-dialog {
+  border-radius: 28px !important;
+  overflow: hidden !important;
+  box-shadow: 0 32px 70px rgba(15, 23, 42, 0.2) !important;
+}
+
+:host ::ng-deep .crud-packages-dialog .p-dialog-header {
+  padding: 24px 30px !important;
+  background: linear-gradient(135deg, #15847a 0%, #21c59e 100%) !important;
+  align-items: center !important;
+}
+
+:host ::ng-deep .crud-packages-dialog .p-dialog-title {
+  font-size: 1.18rem !important;
+  font-weight: 700 !important;
+  line-height: 1.35 !important;
+  padding-right: 14px !important;
+}
+
+:host ::ng-deep .crud-packages-dialog .p-dialog-content {
+  padding: 24px 24px 26px !important;
+  background:
+    radial-gradient(circle at top left, rgba(45, 212, 191, 0.08), transparent 28%),
+    linear-gradient(180deg, #f8fbff 0%, #f1f5f9 100%) !important;
+}
+
+:host ::ng-deep .crud-packages-dialog .p-dialog-header-icon {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 12px !important;
+}
+
+:host ::ng-deep .crud-packages-dialog .p-dialog-header-icon:hover {
+  background: rgba(255, 255, 255, 0.16) !important;
+}
+
 .missing-resource {
   padding: 2rem;
 }
 
 @media (max-width: 768px) {
+  .packages-dialog-header,
   .actions-cell,
   .dialog-actions {
     justify-content: stretch;
   }
 
+  .packages-dialog-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .package-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .package-reset-btn {
+    width: 100%;
+  }
+
+  .action-icon-btn,
   .actions-cell .action-btn,
   .dialog-actions .btn {
     width: 100%;
+  }
+
+  .file-preview-card {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .file-preview-image {
+    width: 100%;
+    height: 180px;
   }
 }

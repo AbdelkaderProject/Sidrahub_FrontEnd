@@ -12,29 +12,38 @@ export function buildNavItems(isAdmin: boolean): INavData[] {
       name: 'Core Services'
     },
     {
-      name: 'Services',
-      url: '/services',
-      iconComponent: { name: 'cil-layers' }
-    },
-    {
       name: 'Service Categories',
       url: '/service-categories',
-      iconComponent: { name: 'cil-tags' }
-    },
-    {
-      name: 'Service Packages',
-      url: '/service-packages',
-      iconComponent: { name: 'cil-briefcase' }
+      iconComponent: { name: 'cil-tags' },
+      children: [
+        {
+          name: 'Categories',
+          url: '/service-categories'
+        },
+        {
+          name: 'Services',
+          url: '/services'
+        },
+        {
+          name: 'Service Packages',
+          url: '/service-packages'
+        }
+      ]
     },
     {
       name: 'Articles',
-      url: '/articles',
-      iconComponent: { name: 'cil-description' }
-    },
-    {
-      name: 'Article Comments',
-      url: '/article-comments',
-      iconComponent: { name: 'cil-comment-square' }
+      url: '/admin/articles',
+      iconComponent: { name: 'cil-description' },
+      children: [
+        {
+          name: 'Articles',
+          url: '/admin/articles'
+        },
+        {
+          name: 'Article Comments',
+          url: '/admin/article-comments'
+        }
+      ]
     },
     
     {
@@ -64,32 +73,6 @@ export function buildNavItems(isAdmin: boolean): INavData[] {
     }
   ];
 
-  if (isAdmin) {
-    items.push({
-      title: true,
-      name: 'Management'
-    });
-    items.push({
-      name: 'Admin APIs',
-      url: '/admin/articles',
-      iconComponent: { name: 'cil-settings' },
-      children: [
-        { name: 'ArticleComments', url: '/admin/article-comments' },
-        { name: 'Articles', url: '/admin/articles' },
-        { name: 'Auth', url: '/admin/auth' },
-        { name: 'CompanyProfiles', url: '/admin/company-profiles' },
-        { name: 'Localization', url: '/admin/localization' },
-        { name: 'ServiceCategories', url: '/admin/service-categories' },
-        { name: 'ServicePackages', url: '/admin/service-packages' },
-        { name: 'Services', url: '/admin/services' },
-        { name: 'Setup', url: '/admin/setup' },
-        { name: 'Sidebars', url: '/admin/sidebars' },
-        { name: 'TeamMembers', url: '/admin/team-members' },
-        { name: 'Partners', url: '/admin/partners' },
-        { name: 'Branches', url: '/admin/branches' }
-      ]
-    });
-  }
 
   items.push({
     name: 'Logout',

@@ -26,28 +26,43 @@ export class AdminResourcePageComponent implements OnInit {
   protected readonly config = signal<AdminResourceConfig | null>(null);
   protected readonly items = signal<Record<string, unknown>[]>([]);
   protected readonly loading = signal(true);
-  protected readonly searchTerm = signal('');
   protected readonly dialogVisible = signal(false);
   protected readonly deleteDialogVisible = signal(false);
+  protected readonly packagesDialogVisible = signal(false);
   protected readonly saving = signal(false);
+  protected readonly packageSaving = signal(false);
   protected readonly currentId = signal<number | null>(null);
+  protected readonly editingPackageId = signal<number | null>(null);
   protected readonly selectedItemLabel = signal('');
+  protected readonly selectedServiceForPackages = signal<Record<string, unknown> | null>(null);
   protected readonly optionMap = signal<Record<string, AdminSelectOption[]>>({});
   protected readonly relationLookup = signal<Record<string, Record<string, string>>>({});
+  protected readonly servicePackages = signal<Record<string, unknown>[]>([]);
+  protected readonly selectedFiles = signal<Record<string, File | null>>({});
+  protected readonly selectedFilePreviews = signal<Record<string, string | null>>({});
 
   protected readonly filteredItems = computed(() => {
     const config = this.config();
-    const term = this.searchTerm().trim().toLowerCase();
     const items = this.items();
-
-    if (!config || !term) {
-      return items;
+    return config?.singleRecord ? items.slice(0, 1) : items;
+  });
+  protected readonly isServicesResource = computed(() => this.config()?.key === 'services');
+  protected readonly showCreateButton = computed(() => {
+    const config = this.config();
+    if (!config?.singleRecord) {
+      return true;
     }
 
-    return items.filter((item) => config.searchKeys.some((key) => String(item[key] ?? '').toLowerCase().includes(term)));
+    return this.items().length === 0;
   });
 
   protected readonly form = new FormGroup<Record<string, FormControl>>({});
+  protected readonly packageForm = this.fb.group({
+    nameAr: this.fb.nonNullable.control('', Validators.required),
+    nameEn: this.fb.nonNullable.control('', Validators.required),
+    icon: this.fb.control<string | null>(''),
+    costAmount: this.fb.nonNullable.control(0, [Validators.required, Validators.min(0)]),
+  });
 
   async ngOnInit(): Promise<void> {
     const resourceKey = this.route.snapshot.data['resourceKey'] as string;
@@ -64,13 +79,10 @@ export class AdminResourcePageComponent implements OnInit {
     await this.refresh();
   }
 
-  protected onSearch(term: string): void {
-    this.searchTerm.set(term);
-  }
-
   protected openCreateDialog(): void {
     this.currentId.set(null);
     this.selectedItemLabel.set('');
+    this.resetFileSelections();
     this.form.reset(this.createEmptyFormValue());
     this.dialogVisible.set(true);
   }
@@ -78,6 +90,7 @@ export class AdminResourcePageComponent implements OnInit {
   protected openEditDialog(item: Record<string, unknown>): void {
     this.currentId.set(Number(item['id']));
     this.selectedItemLabel.set(this.getPrimaryLabel(item));
+    this.resetFileSelections();
     this.form.reset(this.mapItemToFormValue(item));
     this.dialogVisible.set(true);
   }
@@ -88,13 +101,35 @@ export class AdminResourcePageComponent implements OnInit {
     this.deleteDialogVisible.set(true);
   }
 
+  protected async openPackagesDialog(item: Record<string, unknown>): Promise<void> {
+    this.selectedServiceForPackages.set(item);
+    this.packagesDialogVisible.set(true);
+    this.startCreatePackage();
+    await this.refreshPackages();
+  }
+
   protected closeFormDialog(): void {
     this.dialogVisible.set(false);
     this.saving.set(false);
+    this.resetFileSelections();
   }
 
   protected closeDeleteDialog(): void {
     this.deleteDialogVisible.set(false);
+  }
+
+  protected closePackagesDialog(): void {
+    this.packagesDialogVisible.set(false);
+    this.packageSaving.set(false);
+    this.editingPackageId.set(null);
+    this.selectedServiceForPackages.set(null);
+    this.servicePackages.set([]);
+    this.packageForm.reset({
+      nameAr: '',
+      nameEn: '',
+      icon: '',
+      costAmount: 0,
+    });
   }
 
   protected async save(): Promise<void> {
@@ -109,9 +144,13 @@ export class AdminResourcePageComponent implements OnInit {
     }
 
     this.saving.set(true);
-    const payload = this.normalizePayload(this.form.getRawValue() as Record<string, unknown>, config.formFields);
 
     try {
+      const payload = await this.resolveFileUploads(
+        this.normalizePayload(this.form.getRawValue() as Record<string, unknown>, config.formFields),
+        config.formFields,
+      );
+
       if (this.currentId()) {
         await firstValueFrom(this.api.update(config.endpoint, this.currentId() as number, payload));
       } else {
@@ -164,12 +203,146 @@ export class AdminResourcePageComponent implements OnInit {
     return Number(value);
   }
 
+  protected getImageUrl(item: Record<string, unknown>, key: string): string | null {
+    const value = item[key];
+    if (value === null || value === undefined || value === '') {
+      return null;
+    }
+
+    return this.api.resolveAssetUrl(String(value));
+  }
+
+  protected onFileSelected(field: AdminResourceFieldConfig, event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0] ?? null;
+
+    this.selectedFiles.update((state) => ({ ...state, [field.key]: file }));
+
+    if (!file) {
+      this.selectedFilePreviews.update((state) => ({ ...state, [field.key]: null }));
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.selectedFilePreviews.update((state) => ({ ...state, [field.key]: String(reader.result ?? '') }));
+    };
+    reader.readAsDataURL(file);
+  }
+
+  protected clearFileSelection(fieldKey: string, input?: HTMLInputElement): void {
+    this.selectedFiles.update((state) => ({ ...state, [fieldKey]: null }));
+    this.selectedFilePreviews.update((state) => ({ ...state, [fieldKey]: null }));
+    this.form.get(fieldKey)?.setValue('');
+
+    if (input) {
+      input.value = '';
+    }
+  }
+
+  protected getFilePreview(fieldKey: string): string | null {
+    const selectedPreview = this.selectedFilePreviews()[fieldKey];
+    if (selectedPreview) {
+      return selectedPreview;
+    }
+
+    const currentValue = this.form.get(fieldKey)?.value;
+    return typeof currentValue === 'string' && currentValue.trim() !== '' ? this.api.resolveAssetUrl(currentValue) : null;
+  }
+
   protected fieldOptions(field: AdminResourceFieldConfig): AdminSelectOption[] {
     return this.optionMap()[field.key] ?? field.staticOptions ?? [];
   }
 
   protected trackByField(_: number, field: AdminResourceFieldConfig): string {
     return field.key;
+  }
+
+  protected selectedServicePackagesLabel(): string {
+    const service = this.selectedServiceForPackages();
+    return service ? this.pickLabel(service, ['nameEn', 'nameAr', 'id']) : 'Service';
+  }
+
+  protected packageHeaderActionLabel(): string {
+    if (this.packageSaving()) {
+      return 'Saving...';
+    }
+
+    return this.editingPackageId() ? 'Update Package' : 'Add Package';
+  }
+
+  protected startCreatePackage(): void {
+    this.editingPackageId.set(null);
+    this.packageForm.reset({
+      nameAr: '',
+      nameEn: '',
+      icon: '',
+      costAmount: 0,
+    });
+  }
+
+  protected startEditPackage(item: Record<string, unknown>): void {
+    this.editingPackageId.set(Number(item['id']));
+    this.packageForm.reset({
+      nameAr: String(item['nameAr'] ?? ''),
+      nameEn: String(item['nameEn'] ?? ''),
+      icon: item['icon'] === null || item['icon'] === undefined ? '' : String(item['icon']),
+      costAmount: Number(item['costAmount'] ?? 0),
+    });
+  }
+
+  protected async savePackage(): Promise<void> {
+    const service = this.selectedServiceForPackages();
+    if (!service) {
+      return;
+    }
+
+    this.packageForm.markAllAsTouched();
+    if (this.packageForm.invalid) {
+      return;
+    }
+
+    const payload = {
+      serviceId: Number(service['id']),
+      nameAr: this.packageForm.controls.nameAr.value.trim(),
+      nameEn: this.packageForm.controls.nameEn.value.trim(),
+      icon: (this.packageForm.controls.icon.value ?? '').trim() || null,
+      costAmount: Number(this.packageForm.controls.costAmount.value),
+    };
+
+    this.packageSaving.set(true);
+    try {
+      const packageId = this.editingPackageId();
+      if (packageId) {
+        await firstValueFrom(this.api.update('ServicePackages', packageId, payload));
+      } else {
+        await firstValueFrom(this.api.create('ServicePackages', payload));
+      }
+
+      this.startCreatePackage();
+      await this.refreshPackages();
+    } finally {
+      this.packageSaving.set(false);
+    }
+  }
+
+  protected async deletePackage(item: Record<string, unknown>): Promise<void> {
+    const packageId = Number(item['id']);
+    const packageLabel = this.pickLabel(item, ['nameEn', 'nameAr', 'id']);
+    if (!packageId || !window.confirm(`Delete package "${packageLabel}"?`)) {
+      return;
+    }
+
+    this.packageSaving.set(true);
+    try {
+      await firstValueFrom(this.api.delete('ServicePackages', packageId));
+      if (this.editingPackageId() === packageId) {
+        this.startCreatePackage();
+      }
+      await this.refreshPackages();
+    } finally {
+      this.packageSaving.set(false);
+    }
   }
 
   private async refresh(): Promise<void> {
@@ -185,6 +358,18 @@ export class AdminResourcePageComponent implements OnInit {
     } finally {
       this.loading.set(false);
     }
+  }
+
+  private async refreshPackages(): Promise<void> {
+    const service = this.selectedServiceForPackages();
+    if (!service) {
+      this.servicePackages.set([]);
+      return;
+    }
+
+    const serviceId = Number(service['id']);
+    const data = await firstValueFrom(this.api.list<Record<string, unknown>>('ServicePackages'));
+    this.servicePackages.set(data.filter((item) => Number(item['serviceId']) === serviceId));
   }
 
   private buildForm(config: AdminResourceConfig): void {
@@ -263,7 +448,7 @@ export class AdminResourcePageComponent implements OnInit {
           fieldValue = fieldValue === '' || fieldValue === null ? 0 : Number(fieldValue);
         }
 
-        if ((field.type === 'text' || field.type === 'textarea' || field.type === 'url') && fieldValue !== null && fieldValue !== undefined) {
+        if ((field.type === 'text' || field.type === 'textarea' || field.type === 'url' || field.type === 'file') && fieldValue !== null && fieldValue !== undefined) {
           const trimmed = String(fieldValue).trim();
           fieldValue = trimmed === '' && !field.required ? null : trimmed;
         }
@@ -285,5 +470,34 @@ export class AdminResourcePageComponent implements OnInit {
   private pickLabel(item: Record<string, unknown>, keys: string[]): string {
     const matched = keys.map((key) => item[key]).find((value) => value !== null && value !== undefined && String(value).trim() !== '');
     return matched ? String(matched) : String(item['id'] ?? '');
+  }
+
+  private async resolveFileUploads(
+    payload: Record<string, unknown>,
+    fields: AdminResourceFieldConfig[],
+  ): Promise<Record<string, unknown>> {
+    const updatedPayload = { ...payload };
+
+    for (const field of fields) {
+      if (field.type !== 'file') {
+        continue;
+      }
+
+      const selectedFile = this.selectedFiles()[field.key];
+      if (!selectedFile) {
+        continue;
+      }
+
+      const folder = field.uploadFolder ?? this.config()?.key ?? 'uploads';
+      const response = await firstValueFrom(this.api.uploadFile(selectedFile, folder));
+      updatedPayload[field.key] = response.url;
+    }
+
+    return updatedPayload;
+  }
+
+  private resetFileSelections(): void {
+    this.selectedFiles.set({});
+    this.selectedFilePreviews.set({});
   }
 }

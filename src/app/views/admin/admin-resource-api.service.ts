@@ -8,6 +8,8 @@ import { environment } from '../../environments/environment';
 export class AdminResourceApiService {
   constructor(private readonly http: HttpClient) {}
 
+  private readonly apiBaseUrl = environment.apiUrl.replace(/\/api\/?$/, '');
+
   list<T>(endpoint: string): Observable<T[]> {
     return this.http.get<T[]>(this.buildUrl(endpoint));
   }
@@ -26,6 +28,26 @@ export class AdminResourceApiService {
 
   get<T>(endpoint: string, suffix = ''): Observable<T> {
     return this.http.get<T>(`${this.buildUrl(endpoint)}${suffix}`);
+  }
+
+  uploadFile(file: File, folder: string): Observable<{ url: string }> {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('folder', folder);
+    return this.http.post<{ url: string }>(`${this.apiBaseUrl}/api/Uploads`, formData);
+  }
+
+  resolveAssetUrl(path: string | null | undefined): string | null {
+    if (!path) {
+      return null;
+    }
+
+    if (/^https?:\/\//i.test(path)) {
+      return path;
+    }
+
+    const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+    return `${this.apiBaseUrl}${normalizedPath}`;
   }
 
   private buildUrl(endpoint: string): string {

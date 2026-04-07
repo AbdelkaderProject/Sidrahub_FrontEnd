@@ -6,19 +6,13 @@
     [tableTitle]="resource.tableTitle"
     [tableIcon]="resource.icon"
     [createLabel]="resource.createLabel"
+    [showCreateButton]="showCreateButton()"
     [loading]="loading()"
     [hasData]="filteredItems().length > 0"
     [emptyTitle]="resource.emptyTitle"
     [emptyMessage]="resource.emptyMessage"
     (create)="openCreateDialog()"
   >
-    <div crud-filters class="crud-filters-card">
-      <label class="search-box">
-        <i class="pi pi-search"></i>
-        <input type="search" [value]="searchTerm()" (input)="onSearch(($any($event.target)).value)" placeholder="Search records..." />
-      </label>
-    </div>
-
     <div table-actions>
       <span class="records-count">{{ filteredItems().length }} record(s)</span>
     </div>
@@ -36,10 +30,26 @@
             <td *ngFor="let column of resource.columns">
               <ng-container [ngSwitch]="column.type">
                 <span *ngSwitchCase="'currency'">{{ getCurrencyValue(item, column.key) | currency:'USD':'symbol':'1.2-2' }}</span>
+                <ng-container *ngSwitchCase="'image'">
+                  <img *ngIf="getImageUrl(item, column.key) as imageUrl; else noImageCell" [src]="imageUrl" [alt]="column.label || column.key" class="table-image-preview" />
+                  <ng-template #noImageCell>
+                    <span>-</span>
+                  </ng-template>
+                </ng-container>
                 <span *ngSwitchDefault>{{ getCellValue(item, column.key) }}</span>
               </ng-container>
             </td>
             <td class="actions-cell">
+              <button
+                *ngIf="isServicesResource()"
+                type="button"
+                class="action-icon-btn action-btn-packages"
+                title="Manage Service Packages"
+                aria-label="Manage Service Packages"
+                (click)="openPackagesDialog(item)"
+              >
+                <i class="pi pi-box"></i>
+              </button>
               <button type="button" class="action-btn action-btn-edit" (click)="openEditDialog(item)">Edit</button>
               <button type="button" class="action-btn action-btn-delete" (click)="openDeleteDialog(item)">Delete</button>
             </td>
@@ -64,6 +74,27 @@
 
             <textarea *ngSwitchCase="'textarea'" [id]="field.key" [rows]="field.rows || 4" [placeholder]="field.placeholder || ''" [formControlName]="field.key"></textarea>
 
+            <div *ngSwitchCase="'file'" class="file-upload-field">
+              <input
+                #fileInput
+                [id]="field.key"
+                type="file"
+                [attr.accept]="field.accept || 'image/*'"
+                class="file-upload-input"
+                (change)="onFileSelected(field, $event)"
+              />
+
+              <div class="file-upload-meta">
+                <span>Select image to upload</span>
+                <small>Stored inside server uploads folder</small>
+              </div>
+
+              <div class="file-preview-card" *ngIf="getFilePreview(field.key) as preview">
+                <img [src]="preview" [alt]="field.label" class="file-preview-image" />
+                <button type="button" class="file-remove-btn" (click)="clearFileSelection(field.key, fileInput)">Remove</button>
+              </div>
+            </div>
+
             <input *ngSwitchDefault [id]="field.key" [type]="field.type" [attr.min]="field.min ?? null" [attr.step]="field.step ?? null" [placeholder]="field.placeholder || ''" [formControlName]="field.key" />
           </ng-container>
 
@@ -83,6 +114,86 @@
         <div class="dialog-actions">
           <button type="button" class="btn btn-secondary" (click)="closeDeleteDialog()">Cancel</button>
           <button type="button" class="btn btn-danger" [disabled]="saving()" (click)="confirmDelete()">{{ saving() ? 'Deleting...' : 'Delete' }}</button>
+        </div>
+      </div>
+    </app-dialog-shell>
+
+    <app-dialog-shell
+      crud-dialog
+      [visible]="packagesDialogVisible()"
+      (visibleChange)="packagesDialogVisible.set($event)"
+      (onHide)="closePackagesDialog()"
+      [header]="'Manage Packages - ' + selectedServicePackagesLabel()"
+      [style]="{ width: 'min(860px, 92vw)' }"
+      styleClass="crud-packages-dialog"
+    >
+      <div class="packages-dialog" *ngIf="selectedServiceForPackages() as service">
+        <div class="packages-dialog-header">
+          <div>
+            <h3>Service Packages</h3>
+            <p>Create and update packages for <strong>{{ selectedServicePackagesLabel() }}</strong>.</p>
+          </div>
+          <button type="button" class="btn btn-secondary package-reset-btn" [disabled]="packageSaving()" (click)="savePackage()">
+            {{ packageHeaderActionLabel() }}
+          </button>
+        </div>
+
+        <form class="package-form-card" [formGroup]="packageForm" (ngSubmit)="savePackage()">
+          <div class="package-form-grid">
+            <div class="crud-form-field">
+              <label for="package-name-en">Name (EN) <span>*</span></label>
+              <input id="package-name-en" type="text" formControlName="nameEn" placeholder="Enter package name in English" />
+              <small class="field-error" *ngIf="packageForm.controls.nameEn.invalid && packageForm.controls.nameEn.touched">Name (EN) is required.</small>
+            </div>
+
+            <div class="crud-form-field">
+              <label for="package-name-ar">Name (AR) <span>*</span></label>
+              <input id="package-name-ar" type="text" formControlName="nameAr" placeholder="Enter package name in Arabic" />
+              <small class="field-error" *ngIf="packageForm.controls.nameAr.invalid && packageForm.controls.nameAr.touched">Name (AR) is required.</small>
+            </div>
+
+            <div class="crud-form-field">
+              <label for="package-icon">Icon</label>
+              <input id="package-icon" type="text" formControlName="icon" placeholder="pi pi-star" />
+            </div>
+
+            <div class="crud-form-field">
+              <label for="package-cost">Cost Amount <span>*</span></label>
+              <input id="package-cost" type="number" min="0" step="0.01" formControlName="costAmount" />
+              <small class="field-error" *ngIf="packageForm.controls.costAmount.invalid && packageForm.controls.costAmount.touched">Cost Amount must be 0 or more.</small>
+            </div>
+          </div>
+        </form>
+
+        <div class="packages-table-wrap">
+          <table class="table admin-table packages-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>NAME (EN)</th>
+                <th>NAME (AR)</th>
+                <th>ICON</th>
+                <th>COST</th>
+                <th class="actions-column">ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngIf="servicePackages().length === 0">
+                <td colspan="6" class="packages-empty-state">No packages added for this service yet.</td>
+              </tr>
+              <tr *ngFor="let package of servicePackages()">
+                <td>{{ package['id'] }}</td>
+                <td>{{ package['nameEn'] || '-' }}</td>
+                <td>{{ package['nameAr'] || '-' }}</td>
+                <td>{{ package['icon'] || '-' }}</td>
+                <td>{{ getCurrencyValue(package, 'costAmount') | currency:'USD':'symbol':'1.2-2' }}</td>
+                <td class="actions-cell">
+                  <button type="button" class="action-btn action-btn-edit" (click)="startEditPackage(package)">Edit</button>
+                  <button type="button" class="action-btn action-btn-delete" [disabled]="packageSaving()" (click)="deletePackage(package)">Delete</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </app-dialog-shell>

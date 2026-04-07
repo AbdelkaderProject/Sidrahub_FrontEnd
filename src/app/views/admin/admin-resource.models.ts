@@ -1,4 +1,4 @@
-export type AdminFieldType = 'text' | 'textarea' | 'number' | 'url' | 'select';
+export type AdminFieldType = 'text' | 'textarea' | 'number' | 'url' | 'select' | 'file';
 
 export interface AdminSelectOption {
   label: string;
@@ -17,12 +17,14 @@ export interface AdminResourceFieldConfig {
   staticOptions?: AdminSelectOption[];
   optionsEndpoint?: string;
   optionLabelKeys?: string[];
+  accept?: string;
+  uploadFolder?: string;
 }
 
 export interface AdminResourceColumnConfig {
   key: string;
   label: string;
-  type?: 'text' | 'number' | 'currency' | 'relation';
+  type?: 'text' | 'number' | 'currency' | 'relation' | 'image';
 }
 
 export interface AdminResourceConfig {
@@ -31,6 +33,7 @@ export interface AdminResourceConfig {
   subtitle: string;
   endpoint: string;
   icon: string;
+  singleRecord?: boolean;
   tableTitle: string;
   createLabel: string;
   emptyTitle: string;

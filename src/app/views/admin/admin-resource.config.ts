@@ -37,7 +37,7 @@ export const ADMIN_RESOURCE_CONFIGS: Record<string, AdminResourceConfig> = {
       { key: 'id', label: 'ID', type: 'number' },
       { key: 'titleEn', label: 'Title (EN)' },
       { key: 'titleAr', label: 'Title (AR)' },
-      { key: 'image', label: 'Image' },
+      { key: 'image', label: 'Image', type: 'image' },
     ],
     formFields: [
       { key: 'titleAr', label: 'Title (AR)', type: 'text', required: true },
@@ -46,7 +46,7 @@ export const ADMIN_RESOURCE_CONFIGS: Record<string, AdminResourceConfig> = {
       { key: 'shortDescriptionEn', label: 'Short Description (EN)', type: 'textarea', required: true, rows: 3 },
       { key: 'descriptionAr', label: 'Description (AR)', type: 'textarea', required: true, rows: 6 },
       { key: 'descriptionEn', label: 'Description (EN)', type: 'textarea', required: true, rows: 6 },
-      { key: 'image', label: 'Image URL', type: 'url', placeholder: 'https://...' },
+      { key: 'image', label: 'Image File', type: 'file', accept: 'image/*', uploadFolder: 'articles' },
     ],
   },
   'company-profiles': {
@@ -55,6 +55,7 @@ export const ADMIN_RESOURCE_CONFIGS: Record<string, AdminResourceConfig> = {
     subtitle: 'Keep company profile content and business metrics aligned.',
     endpoint: 'CompanyProfiles',
     icon: 'pi pi-building',
+    singleRecord: true,
     tableTitle: 'Company Profiles',
     createLabel: 'Add Profile',
     emptyTitle: 'No profiles available',
@@ -70,7 +71,7 @@ export const ADMIN_RESOURCE_CONFIGS: Record<string, AdminResourceConfig> = {
     formFields: [
       { key: 'nameAr', label: 'Name (AR)', type: 'text', required: true },
       { key: 'nameEn', label: 'Name (EN)', type: 'text', required: true },
-      { key: 'logo', label: 'Logo URL', type: 'url', placeholder: 'https://...' },
+      { key: 'logo', label: 'Logo File', type: 'file', accept: 'image/*', uploadFolder: 'company-profiles' },
       { key: 'descriptionAr', label: 'Description (AR)', type: 'textarea', required: true, rows: 4 },
       { key: 'descriptionEn', label: 'Description (EN)', type: 'textarea', required: true, rows: 4 },
       { key: 'insgramLinkStr', label: 'Instagram URL', type: 'url' },
@@ -176,7 +177,7 @@ export const ADMIN_RESOURCE_CONFIGS: Record<string, AdminResourceConfig> = {
       { key: 'serviceId', label: 'Service', type: 'relation' },
       { key: 'titleEn', label: 'Title (EN)' },
       { key: 'titleAr', label: 'Title (AR)' },
-      { key: 'image', label: 'Image' },
+      { key: 'image', label: 'Image', type: 'image' },
     ],
     formFields: [
       { key: 'serviceId', label: 'Service', type: 'select', required: true, optionsEndpoint: 'Services', optionLabelKeys: ['nameEn', 'nameAr', 'id'] },
@@ -184,7 +185,7 @@ export const ADMIN_RESOURCE_CONFIGS: Record<string, AdminResourceConfig> = {
       { key: 'titleEn', label: 'Title (EN)', type: 'text', required: true },
       { key: 'descriptionAr', label: 'Description (AR)', type: 'textarea', required: true, rows: 4 },
       { key: 'descriptionEn', label: 'Description (EN)', type: 'textarea', required: true, rows: 4 },
-      { key: 'image', label: 'Image URL', type: 'url', placeholder: 'https://...' },
+      { key: 'image', label: 'Image File', type: 'file', accept: 'image/*', uploadFolder: 'sidebars' },
     ],
   },
   'team-members': {
@@ -234,13 +235,13 @@ export const ADMIN_RESOURCE_CONFIGS: Record<string, AdminResourceConfig> = {
       { key: 'companyProfileId', label: 'Company Profile', type: 'relation' },
       { key: 'nameEn', label: 'Name (EN)' },
       { key: 'nameAr', label: 'Name (AR)' },
-      { key: 'logo', label: 'Logo' },
+      { key: 'logo', label: 'Logo', type: 'image' },
     ],
     formFields: [
       { key: 'companyProfileId', label: 'Company Profile', type: 'select', required: true, optionsEndpoint: 'CompanyProfiles', optionLabelKeys: ['nameEn', 'nameAr', 'id'] },
       { key: 'nameEn', label: 'Name (EN)', type: 'text', required: true },
       { key: 'nameAr', label: 'Name (AR)', type: 'text', required: true },
-      { key: 'logo', label: 'Logo URL', type: 'url', placeholder: 'https://...' },
+      { key: 'logo', label: 'Logo File', type: 'file', accept: 'image/*', uploadFolder: 'partners' },
     ],
   },
   branches: {

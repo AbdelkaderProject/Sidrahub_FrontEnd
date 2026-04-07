@@ -22,24 +22,24 @@ interface QuickLink {
   styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent {
-  readonly title = 'Shop Stop One - Business Platform';
-  readonly subtitle = 'Unified workspace for company setup, legal advisory, accounting, HR, workspaces, and partnerships.';
-  readonly modulesTitle = 'Platform Modules';
-  readonly modulesHint = 'Open any module to manage related records and workflows.';
-  readonly scenarioHint = 'Scenario: client submits an order, then admin receives it and contacts the client directly.';
+  readonly title = 'SidraHub Admin Dashboard';
+  readonly subtitle = 'Unified workspace to manage company profile content, services, articles, partners, branches, and incoming orders.';
+  readonly modulesTitle = 'SidraHub Modules';
+  readonly modulesHint = 'Open any section to manage the content and records displayed across the SidraHub platform.';
+  readonly scenarioHint = 'Flow: update your company profile, publish services and articles, then track incoming client orders from one place.';
 
   readonly stats: DashboardStat[] = [
+    { icon: 'pi pi-building', label: 'Company Profile', value: '1' },
     { icon: 'pi pi-briefcase', label: 'Published Services', value: '24+' },
     { icon: 'pi pi-shopping-cart', label: 'Active Orders', value: '18' },
-    { icon: 'pi pi-send', label: 'Submitted Today', value: '7' },
-    { icon: 'pi pi-users', label: 'Service Providers', value: '9' }
+    { icon: 'pi pi-users', label: 'Partners & Team', value: '12' }
   ];
 
   readonly quickLinks: QuickLink[] = [
-    { route: '/services', title: 'Services', description: 'Manage categories, pricing, and estimated delivery time.' },
-    { route: '/orders', title: 'Orders', description: 'Client submits order and admin follows up by phone/email.' },
-    { route: '/consultations', title: 'Consultations', description: 'Handle free consultation requests from clients.' },
-    { route: '/providers', title: 'Providers', description: 'Manage provider profiles and service assignments.' },
-    { route: '/blog', title: 'Blog', description: 'Publish bilingual SEO articles and updates.' }
+    { route: '/company-profiles', title: 'Company Profile', description: 'Manage the main company identity, description, logo, and business metrics.' },
+    { route: '/services', title: 'Services', description: 'Manage services, categories, packages, and what appears to clients on the platform.' },
+    { route: '/orders', title: 'Orders', description: 'Track submitted orders and follow up with clients from the admin dashboard.' },
+    { route: '/partners', title: 'Partners', description: 'Manage partner logos and connect each partner to the company profile.' },
+    { route: '/articles', title: 'Articles', description: 'Publish bilingual articles and manage article comments from the content section.' }
   ];
 }
