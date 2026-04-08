@@ -23,10 +23,6 @@ export function buildNavItems(isAdmin: boolean): INavData[] {
         {
           name: 'Services',
           url: '/services'
-        },
-        {
-          name: 'Service Packages',
-          url: '/service-packages'
         }
       ]
     },

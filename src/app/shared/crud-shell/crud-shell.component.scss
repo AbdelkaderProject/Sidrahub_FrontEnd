@@ -8,32 +8,36 @@
 
 .crud-shell-header {
   margin-bottom: 0;
-  gap: 4px;
+  gap: 0;
+  align-items: center;
   flex-wrap: wrap;
-  padding: 10px 16px;
-  min-height: 76px;
+  padding: 0 6px;
+  min-height: 0;
+  align-content: center;
 }
 
 .title-group {
   display: grid;
   gap: 0;
+  align-items: center;
 }
 
 .crud-shell-header h1 {
-  font-size: 1.75rem;
+  font-size: 1rem;
   font-weight: 800;
-  line-height: 1.15;
+  line-height: 1;
 }
 
 .crud-shell-header h1 i {
-  font-size: 1.35rem;
+  font-size: 0.9rem;
 }
 
 .crud-create-button {
   white-space: nowrap;
-  padding: 10px 18px;
-  font-size: 0.95rem;
-  border-radius: 14px;
+  padding: 4px 14px;
+  font-size: 0.9rem;
+  border-radius: 12px;
+  line-height: 1;
 }
 
 .crud-filters {
