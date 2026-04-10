@@ -1,14 +1,35 @@
 @use "../../../scss/shared-design" as design;
 
 .records-count {
-  color: design.$text-secondary;
+  display: inline-flex;
+  align-items: center;
+  min-height: 2rem;
+  padding: 0 0.85rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(20, 184, 166, 0.12), rgba(59, 130, 246, 0.08));
+  color: #0f766e;
   font-size: design.$font-size-sm;
   font-weight: design.$font-weight-semibold;
+  border: 1px solid rgba(20, 184, 166, 0.12);
 }
 
+:host ::ng-deep .prime-admin-table {
+  overflow: hidden;
+  border-radius: 20px;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.06);
+}
+
+:host ::ng-deep .prime-admin-table .p-datatable-table {
+  min-width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+:host ::ng-deep .prime-admin-table .p-datatable-thead > tr > th,
 .admin-table thead th {
-  background: #f8fafc;
-  color: #1f2937;
+  background: linear-gradient(180deg, #f8fbff 0%, #f1f5f9 100%);
+  color: #49688f;
   font-size: 0.85rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -18,6 +39,28 @@
   text-align: left;
 }
 
+:host ::ng-deep .prime-admin-table .p-datatable-tbody > tr > td {
+  padding: 16px;
+  vertical-align: top;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+  background: #ffffff;
+  transition: background 0.18s ease, transform 0.18s ease;
+}
+
+:host ::ng-deep .prime-admin-table .p-datatable-tbody > tr:hover > td {
+  background: #f9fcff;
+}
+
+:host ::ng-deep .prime-admin-table .p-datatable-tbody > tr:last-child > td {
+  border-bottom: 0;
+}
+
+.admin-table tbody td {
+  vertical-align: top;
+}
+
+:host ::ng-deep .prime-admin-table th:last-child,
+:host ::ng-deep .prime-admin-table td:last-child,
 .admin-table th:last-child,
 .admin-table td:last-child {
   text-align: right;
@@ -32,16 +75,12 @@
 
 .actions-cell {
   display: flex;
-  gap: design.$spacing-sm;
+  gap: 10px;
   justify-content: flex-end;
-  align-items: flex-start;
+  align-items: center;
   white-space: nowrap;
   width: fit-content;
   margin-left: auto;
-}
-
-.admin-table tbody td {
-  vertical-align: top;
 }
 
 .table-image-preview {
@@ -92,6 +131,78 @@
 
 .action-icon-btn i {
   font-size: 1rem;
+}
+
+.row-action-trigger {
+  width: 2.55rem !important;
+  height: 2.55rem !important;
+  border-radius: 16px !important;
+  border: 0 !important;
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08) !important;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease !important;
+}
+
+:host ::ng-deep .row-action-trigger .p-button-icon {
+  font-size: 1rem !important;
+  font-weight: 700;
+}
+
+.row-action-trigger:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 26px rgba(15, 23, 42, 0.12) !important;
+}
+
+.row-action-edit {
+  color: #b45309 !important;
+  background: linear-gradient(135deg, rgba(253, 224, 71, 0.34), rgba(245, 158, 11, 0.16)) !important;
+}
+
+:host ::ng-deep .row-action-edit .p-button-icon {
+  color: #b45309 !important;
+}
+
+.row-action-edit:hover {
+  color: #92400e !important;
+  background: linear-gradient(135deg, rgba(253, 224, 71, 0.44), rgba(245, 158, 11, 0.24)) !important;
+}
+
+:host ::ng-deep .row-action-edit:hover .p-button-icon {
+  color: #92400e !important;
+}
+
+.row-action-delete {
+  color: #dc2626 !important;
+  background: linear-gradient(135deg, rgba(254, 202, 202, 0.38), rgba(239, 68, 68, 0.14)) !important;
+}
+
+:host ::ng-deep .row-action-delete .p-button-icon {
+  color: #dc2626 !important;
+}
+
+.row-action-delete:hover {
+  color: #b91c1c !important;
+  background: linear-gradient(135deg, rgba(254, 202, 202, 0.5), rgba(239, 68, 68, 0.22)) !important;
+}
+
+:host ::ng-deep .row-action-delete:hover .p-button-icon {
+  color: #b91c1c !important;
+}
+
+.row-action-packages {
+  color: #047857 !important;
+  background: linear-gradient(135deg, rgba(110, 231, 183, 0.24), rgba(16, 185, 129, 0.12)) !important;
+}
+
+:host ::ng-deep .row-action-packages .p-button-icon {
+  color: #047857 !important;
+}
+
+.row-action-packages:hover {
+  background: linear-gradient(135deg, rgba(110, 231, 183, 0.34), rgba(16, 185, 129, 0.18)) !important;
+}
+
+:host ::ng-deep .row-action-packages:hover .p-button-icon {
+  color: #065f46 !important;
 }
 
 .action-btn-packages {
@@ -434,6 +545,7 @@
 
   .action-icon-btn,
   .actions-cell .action-btn,
+  .actions-cell .p-button,
   .dialog-actions .btn {
     width: 100%;
   }

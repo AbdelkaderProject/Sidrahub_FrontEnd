@@ -2,6 +2,8 @@ import { CommonModule, CurrencyPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ButtonModule } from 'primeng/button';
+import { TableModule } from 'primeng/table';
 import { firstValueFrom } from 'rxjs';
 
 import { CrudShellComponent } from '../../shared/crud-shell';
@@ -13,7 +15,7 @@ import { AdminResourceConfig, AdminResourceFieldConfig, AdminSelectOption } from
 @Component({
   selector: 'app-admin-resource-page',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, CurrencyPipe, RouterLink, CrudShellComponent, DialogShellComponent],
+  imports: [CommonModule, ReactiveFormsModule, CurrencyPipe, RouterLink, CrudShellComponent, DialogShellComponent, TableModule, ButtonModule],
   templateUrl: './admin-resource-page.component.html',
   styleUrls: ['./admin-resource-page.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -40,6 +42,7 @@ export class AdminResourcePageComponent implements OnInit {
   protected readonly servicePackages = signal<Record<string, unknown>[]>([]);
   protected readonly selectedFiles = signal<Record<string, File | null>>({});
   protected readonly selectedFilePreviews = signal<Record<string, string | null>>({});
+  protected readonly pageSizeOptions = [5, 10, 20, 50];
 
   protected readonly filteredItems = computed(() => {
     const config = this.config();

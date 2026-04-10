@@ -1,61 +1,70 @@
 <section class="crud-shell-page">
-  <header class="page-header crud-shell-header">
-    <div class="title-group">
-      <h1>
-        <i *ngIf="icon" [class]="icon"></i>
-        <span>{{ title }}</span>
-      </h1>
-      <ng-content select="[crud-header-meta]"></ng-content>
-    </div>
-
-    <div class="header-actions">
-      <ng-content select="[crud-toolbar]"></ng-content>
-
-      <button
-        *ngIf="showCreateButton"
-        type="button"
-        class="btn btn-primary crud-create-button"
-        (click)="create.emit()"
-      >
-        <i class="pi pi-plus"></i>
-        <span>{{ createLabel }}</span>
-      </button>
-    </div>
-  </header>
-
-  <section class="crud-filters" *ngIf="!loading">
-    <ng-content select="[crud-filters]"></ng-content>
-  </section>
-
-  <app-table-shell [title]="tableTitle" [icon]="tableIcon">
-    <app-table-actions table-actions>
-      <ng-content select="[table-actions]"></ng-content>
-    </app-table-actions>
-
-    <ng-container *ngIf="loading; else dataState">
-      <div class="loading-overlay crud-state-card">
-        <div class="spinner"></div>
-        <p>{{ loadingText }}</p>
+  <div class="crud-shell-card">
+    <header class="page-header crud-shell-header">
+      <div class="title-group">
+        <h1>
+          <i *ngIf="icon" [class]="icon"></i>
+          <span>{{ title }}</span>
+        </h1>
       </div>
-    </ng-container>
 
-    <ng-template #dataState>
-      <ng-container *ngIf="hasData; else emptyState">
-        <div class="crud-table-wrap">
-          <ng-content select="[crud-table]"></ng-content>
+      <div class="header-actions">
+        <ng-content select="[crud-toolbar]"></ng-content>
+      </div>
+    </header>
+
+    <section class="crud-shell-body">
+      <div class="crud-shell-topbar">
+        <div class="crud-shell-meta">
+          <ng-content select="[crud-header-meta]"></ng-content>
         </div>
-      </ng-container>
-    </ng-template>
 
-    <ng-template #emptyState>
-      <div class="empty-state crud-state-card">
-        <i class="pi pi-inbox"></i>
-        <h3>{{ emptyTitle }}</h3>
-        <p>{{ emptyMessage }}</p>
-        <ng-content select="[crud-empty-actions]"></ng-content>
+        <button
+          *ngIf="showCreateButton"
+          type="button"
+          class="btn btn-primary crud-create-button"
+          (click)="create.emit()"
+        >
+          <i class="pi pi-plus"></i>
+          <span>{{ createLabel }}</span>
+        </button>
       </div>
-    </ng-template>
-  </app-table-shell>
+
+      <section class="crud-filters" *ngIf="!loading">
+        <ng-content select="[crud-filters]"></ng-content>
+      </section>
+
+      <app-table-shell [title]="tableTitle" [icon]="tableIcon">
+        <app-table-actions table-actions>
+          <ng-content select="[table-actions]"></ng-content>
+        </app-table-actions>
+
+        <ng-container *ngIf="loading; else dataState">
+          <div class="loading-overlay crud-state-card">
+            <div class="spinner"></div>
+            <p>{{ loadingText }}</p>
+          </div>
+        </ng-container>
+
+        <ng-template #dataState>
+          <ng-container *ngIf="hasData; else emptyState">
+            <div class="crud-table-wrap">
+              <ng-content select="[crud-table]"></ng-content>
+            </div>
+          </ng-container>
+        </ng-template>
+
+        <ng-template #emptyState>
+          <div class="empty-state crud-state-card">
+            <i class="pi pi-inbox"></i>
+            <h3>{{ emptyTitle }}</h3>
+            <p>{{ emptyMessage }}</p>
+            <ng-content select="[crud-empty-actions]"></ng-content>
+          </div>
+        </ng-template>
+      </app-table-shell>
+    </section>
+  </div>
 
   <ng-content select="[crud-dialog]"></ng-content>
 </section>

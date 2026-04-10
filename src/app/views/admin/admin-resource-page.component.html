@@ -18,15 +18,25 @@
     </div>
 
     <div crud-table>
-      <table class="table admin-table">
-        <thead>
+      <p-table
+        [value]="filteredItems()"
+        styleClass="admin-table prime-admin-table"
+        responsiveLayout="scroll"
+        [paginator]="filteredItems().length > pageSizeOptions[0]"
+        [rows]="pageSizeOptions[0]"
+        [rowsPerPageOptions]="pageSizeOptions"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
+      >
+        <ng-template pTemplate="header">
           <tr>
             <th *ngFor="let column of resource.columns">{{ column.label || column.key }}</th>
             <th class="actions-column">Actions</th>
           </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let item of filteredItems()">
+        </ng-template>
+
+        <ng-template pTemplate="body" let-item>
+          <tr>
             <td *ngFor="let column of resource.columns">
               <ng-container [ngSwitch]="column.type">
                 <span *ngSwitchCase="'currency'">{{ getCurrencyValue(item, column.key) | currency:'USD':'symbol':'1.2-2' }}</span>
@@ -40,22 +50,38 @@
               </ng-container>
             </td>
             <td class="actions-cell">
-              <button
+              <p-button
                 *ngIf="isServicesResource()"
                 type="button"
-                class="action-icon-btn action-btn-packages"
-                title="Manage Service Packages"
-                aria-label="Manage Service Packages"
-                (click)="openPackagesDialog(item)"
-              >
-                <i class="pi pi-box"></i>
-              </button>
-              <button type="button" class="action-btn action-btn-edit" (click)="openEditDialog(item)">Edit</button>
-              <button type="button" class="action-btn action-btn-delete" (click)="openDeleteDialog(item)">Delete</button>
+                icon="pi pi-box"
+                [text]="true"
+                [rounded]="true"
+                styleClass="row-action-trigger row-action-packages"
+                ariaLabel="Manage packages"
+                (onClick)="openPackagesDialog(item)"
+              ></p-button>
+              <p-button
+                type="button"
+                icon="pi pi-pencil"
+                [text]="true"
+                [rounded]="true"
+                styleClass="row-action-trigger row-action-edit"
+                ariaLabel="Edit row"
+                (onClick)="openEditDialog(item)"
+              ></p-button>
+              <p-button
+                type="button"
+                icon="pi pi-trash"
+                [text]="true"
+                [rounded]="true"
+                styleClass="row-action-trigger row-action-delete"
+                ariaLabel="Delete row"
+                (onClick)="openDeleteDialog(item)"
+              ></p-button>
             </td>
           </tr>
-        </tbody>
-      </table>
+        </ng-template>
+      </p-table>
     </div>
 
     <app-dialog-shell crud-dialog [visible]="dialogVisible()" (visibleChange)="dialogVisible.set($event)" [header]="currentId() ? 'Edit ' + resource.title : 'Create ' + resource.title" [style]="{ width: 'min(960px, 96vw)' }" styleClass="crud-form-dialog">
@@ -166,8 +192,8 @@
         </form>
 
         <div class="packages-table-wrap">
-          <table class="table admin-table packages-table">
-            <thead>
+          <p-table [value]="servicePackages()" styleClass="admin-table packages-table prime-admin-table" responsiveLayout="scroll">
+            <ng-template pTemplate="header">
               <tr>
                 <th>ID</th>
                 <th>NAME (EN)</th>
@@ -176,12 +202,10 @@
                 <th>COST</th>
                 <th class="actions-column">ACTIONS</th>
               </tr>
-            </thead>
-            <tbody>
-              <tr *ngIf="servicePackages().length === 0">
-                <td colspan="6" class="packages-empty-state">No packages added for this service yet.</td>
-              </tr>
-              <tr *ngFor="let package of servicePackages()">
+            </ng-template>
+
+            <ng-template pTemplate="body" let-package>
+              <tr>
                 <td>{{ package['id'] }}</td>
                 <td>{{ package['nameEn'] || '-' }}</td>
                 <td>{{ package['nameAr'] || '-' }}</td>
@@ -192,8 +216,14 @@
                   <button type="button" class="action-btn action-btn-delete" [disabled]="packageSaving()" (click)="deletePackage(package)">Delete</button>
                 </td>
               </tr>
-            </tbody>
-          </table>
+            </ng-template>
+
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="6" class="packages-empty-state">No packages added for this service yet.</td>
+              </tr>
+            </ng-template>
+          </p-table>
         </div>
       </div>
     </app-dialog-shell>

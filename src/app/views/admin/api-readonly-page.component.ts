@@ -1,6 +1,7 @@
 import { CommonModule, JsonPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 import { forkJoin, firstValueFrom } from 'rxjs';
 
 import { CrudShellComponent } from '../../shared/crud-shell';
@@ -9,7 +10,7 @@ import { AdminResourceApiService } from './admin-resource-api.service';
 @Component({
   selector: 'app-api-readonly-page',
   standalone: true,
-  imports: [CommonModule, JsonPipe, RouterLink, CrudShellComponent],
+  imports: [CommonModule, JsonPipe, RouterLink, PaginatorModule, CrudShellComponent],
   templateUrl: './api-readonly-page.component.html',
   styleUrls: ['./api-readonly-page.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -23,6 +24,10 @@ export class ApiReadonlyPageComponent implements OnInit {
   protected readonly icon = signal('pi pi-server');
   protected readonly loading = signal(true);
   protected readonly cards = signal<Array<{ title: string; description: string; link?: string; data?: unknown }>>([]);
+  protected readonly rows = signal(5);
+  protected readonly first = signal(0);
+  protected readonly pageSizeOptions = [5, 10, 20];
+  protected readonly visibleCards = computed(() => this.cards().slice(this.first(), this.first() + this.rows()));
 
   async ngOnInit(): Promise<void> {
     const pageKey = this.route.snapshot.data['pageKey'] as string;
@@ -65,5 +70,10 @@ export class ApiReadonlyPageComponent implements OnInit {
       ]);
       this.loading.set(false);
     }
+  }
+
+  protected onPageChange(event: PaginatorState): void {
+    this.first.set(event.first ?? 0);
+    this.rows.set(event.rows ?? this.pageSizeOptions[0]);
   }
 }

@@ -11,7 +11,7 @@
   emptyMessage="This endpoint did not return any displayable data."
 >
   <div crud-table class="readonly-grid">
-    <article class="readonly-card" *ngFor="let card of cards()">
+    <article class="readonly-card" *ngFor="let card of visibleCards()">
       <div class="readonly-card-head">
         <div>
           <h3>{{ card.title }}</h3>
@@ -22,5 +22,16 @@
 
       <pre *ngIf="card.data">{{ card.data | json }}</pre>
     </article>
+
+    <p-paginator
+      *ngIf="cards().length > pageSizeOptions[0]"
+      [first]="first()"
+      [rows]="rows()"
+      [totalRecords]="cards().length"
+      [rowsPerPageOptions]="pageSizeOptions"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
+      (onPageChange)="onPageChange($event)"
+    ></p-paginator>
   </div>
 </app-crud-shell>
