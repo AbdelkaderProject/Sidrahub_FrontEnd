@@ -68,7 +68,7 @@
 
 .actions-column {
   width: 1%;
-  min-width: 220px;
+  min-width: 270px;
   white-space: nowrap;
   text-align: right;
 }
@@ -203,6 +203,23 @@
 
 :host ::ng-deep .row-action-packages:hover .p-button-icon {
   color: #065f46 !important;
+}
+
+.row-action-slots {
+  color: #1d4ed8 !important;
+  background: linear-gradient(135deg, rgba(147, 197, 253, 0.3), rgba(59, 130, 246, 0.12)) !important;
+}
+
+:host ::ng-deep .row-action-slots .p-button-icon {
+  color: #1d4ed8 !important;
+}
+
+.row-action-slots:hover {
+  background: linear-gradient(135deg, rgba(147, 197, 253, 0.42), rgba(59, 130, 246, 0.18)) !important;
+}
+
+:host ::ng-deep .row-action-slots:hover .p-button-icon {
+  color: #1e40af !important;
 }
 
 .action-btn-packages {
@@ -481,6 +498,53 @@
   text-align: center !important;
   color: design.$text-secondary;
   padding: 24px !important;
+}
+
+.availability-field {
+  align-content: center;
+}
+
+.availability-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 60px;
+  padding: 0 18px;
+  border-radius: 20px;
+  border: 1px solid rgba(203, 213, 225, 0.9);
+  background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+  color: #0f172a;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.availability-toggle input {
+  width: 18px;
+  height: 18px;
+  accent-color: #10b981;
+}
+
+.availability-toggle span {
+  font-weight: 600;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 110px;
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: rgba(16, 185, 129, 0.14);
+  color: #047857;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.status-pill-off {
+  background: rgba(239, 68, 68, 0.12);
+  color: #b91c1c;
 }
 
 :host ::ng-deep .crud-packages-dialog.p-dialog {

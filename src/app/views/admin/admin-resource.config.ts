@@ -122,13 +122,14 @@ export const ADMIN_RESOURCE_CONFIGS: Record<string, AdminResourceConfig> = {
       { key: 'serviceId', label: 'Service', type: 'relation' },
       { key: 'nameEn', label: 'Name (EN)' },
       { key: 'nameAr', label: 'Name (AR)' },
+      { key: 'icon', label: 'Icon', type: 'image' },
       { key: 'costAmount', label: 'Cost', type: 'currency' },
     ],
     formFields: [
       { key: 'serviceId', label: 'Service', type: 'select', required: true, optionsEndpoint: 'Services', optionLabelKeys: ['nameEn', 'nameAr', 'id'] },
       { key: 'nameAr', label: 'Name (AR)', type: 'text', required: true },
       { key: 'nameEn', label: 'Name (EN)', type: 'text', required: true },
-      { key: 'icon', label: 'Icon', type: 'text', placeholder: 'pi pi-star' },
+      { key: 'icon', label: 'Icon File', type: 'file', accept: 'image/*', uploadFolder: 'service-packages' },
       { key: 'costAmount', label: 'Cost Amount', type: 'number', required: true, min: 0, step: '0.01' },
     ],
   },
@@ -148,7 +149,7 @@ export const ADMIN_RESOURCE_CONFIGS: Record<string, AdminResourceConfig> = {
       { key: 'serviceCategoryId', label: 'Category', type: 'relation' },
       { key: 'nameEn', label: 'Name (EN)' },
       { key: 'nameAr', label: 'Name (AR)' },
-      { key: 'icon', label: 'Icon' },
+      { key: 'icon', label: 'Icon', type: 'image' },
     ],
     formFields: [
       { key: 'serviceCategoryId', label: 'Service Category', type: 'select', required: true, optionsEndpoint: 'ServiceCategories', optionLabelKeys: ['nameEn', 'nameAr', 'id'] },
@@ -158,7 +159,7 @@ export const ADMIN_RESOURCE_CONFIGS: Record<string, AdminResourceConfig> = {
       { key: 'shortDescriptionEn', label: 'Short Description (EN)', type: 'textarea', required: true, rows: 3 },
       { key: 'descriptionAr', label: 'Description (AR)', type: 'textarea', required: true, rows: 5 },
       { key: 'descriptionEn', label: 'Description (EN)', type: 'textarea', required: true, rows: 5 },
-      { key: 'icon', label: 'Icon', type: 'text', placeholder: 'pi pi-briefcase' },
+      { key: 'icon', label: 'Icon File', type: 'file', accept: 'image/*', uploadFolder: 'services' },
     ],
   },
   sidebars: {

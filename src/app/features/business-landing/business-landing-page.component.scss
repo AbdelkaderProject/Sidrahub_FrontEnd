@@ -1279,6 +1279,28 @@
     transition: transform 0.35s ease, filter 0.35s ease;
   }
 
+  .team-img--placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #1f6f46 0%, #0f3d27 100%);
+    color: rgba(255, 255, 255, 0.95);
+    font-size: 4rem;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+  }
+
+  .team-img--placeholder span {
+    display: inline-flex;
+    width: 112px;
+    height: 112px;
+    border-radius: 50%;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+  }
+
   .team-socials {
     position: absolute;
     inset-inline: 0;

@@ -7,48 +7,54 @@
 </section>
 
 <section class="articles-section">
+  @let articles = articles$ | async;
+
   <div class="articles-container">
     <aside class="articles-sidebar">
-      <h3>تصفية حسب</h3>
+      <h3>المقالات المتاحة</h3>
       <div class="category-list">
-        <label class="category-item" *ngFor="let category of categories">
-          <input type="checkbox" />
-          <span>{{ category }}</span>
-        </label>
+        @for (article of articles ?? []; track article.id) {
+          <div class="category-item category-item--static">
+            <span>{{ article.titleAr }}</span>
+          </div>
+        } @empty {
+          <div class="category-item category-item--static">
+            <span>لا توجد مقالات متاحة حالياً</span>
+          </div>
+        }
       </div>
     </aside>
 
     <div class="articles-content">
       <div class="articles-grid">
-        <article class="article-card" *ngFor="let article of articles">
-          <div class="article-image-wrap">
-            <img [src]="article.image" [alt]="article.title" />
-          </div>
-
-          <div class="article-topbar">
-            <span class="article-badge">{{ article.category }}</span>
-            <div class="article-meta">
-              <span class="article-type">مقال</span>
-              <span class="article-date">{{ article.date }}</span>
+        @for (article of articles ?? []; track article.id) {
+          <article class="article-card">
+            <div class="article-image-wrap">
+              <img [src]="getArticleImage(article)" [alt]="getArticleTitle(article)" />
             </div>
-          </div>
 
-          <h2>{{ article.title }}</h2>
-          <p>{{ article.description }}</p>
+            <div class="article-topbar">
+              <span class="article-badge">مقال</span>
+              <div class="article-meta">
+                <span class="article-type">من قاعدة البيانات</span>
+                <span class="article-date">#{{ article.id }}</span>
+              </div>
+            </div>
 
-          <a href="#" class="read-more">
-            <span>قراءة المزيد</span>
-            <span class="read-more__arrow">←</span>
-          </a>
-        </article>
-      </div>
+            <h2>{{ getArticleTitle(article) }}</h2>
+            <p>{{ getArticleSummary(article) }}</p>
 
-      <div class="pagination">
-        <a href="#" class="page-link">السابق</a>
-        <a href="#" class="page-number active">1</a>
-        <a href="#" class="page-number">2</a>
-        <a href="#" class="page-number">3</a>
-        <a href="#" class="page-link">التالي</a>
+            <a href="#" class="read-more">
+              <span>قراءة المزيد</span>
+              <span class="read-more__arrow">←</span>
+            </a>
+          </article>
+        } @empty {
+          <article class="article-card article-card--empty">
+            <h2>لا توجد مقالات حالياً</h2>
+            <p>أضف مقالات من لوحة التحكم وستظهر هنا تلقائياً.</p>
+          </article>
+        }
       </div>
     </div>
   </div>

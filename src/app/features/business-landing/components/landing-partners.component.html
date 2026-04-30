@@ -1,4 +1,6 @@
 <section class="partners-section">
+  @let partners = partners$ | async;
+
   <div class="container">
     <div class="section-heading">
       <div class="divider-line"></div>
@@ -6,23 +8,32 @@
     </div>
 
     <div class="partners-row" dir="ltr">
-      @for (partner of partners; track partner.src) {
+      @for (partner of partners ?? []; track partner.id) {
         <div class="partner-item">
-          @if (!hasImageError(partner.src)) {
-            <img
-              class="partner-logo"
-              [src]="partner.src"
-              [alt]="partner.alt"
-              loading="lazy"
-              decoding="async"
-              (error)="onImageError(partner.src)" />
+          @if (getPartnerLogo(partner); as logoUrl) {
+            @if (!hasImageError(logoUrl)) {
+              <img
+                class="partner-logo"
+                [src]="logoUrl"
+                [alt]="getPartnerName(partner)"
+                loading="lazy"
+                decoding="async"
+                (error)="onImageError(logoUrl)" />
+            } @else {
+              <div class="partner-item partner-badge">
+                <div class="badge-en">{{ partner.nameEn }}</div>
+                <div class="badge-ar">{{ partner.nameAr }}</div>
+              </div>
+            }
           } @else {
             <div class="partner-item partner-badge">
-              <div class="badge-en">{{ partner.badgeEn }}</div>
-              <div class="badge-ar">{{ partner.badgeAr }}</div>
+              <div class="badge-en">{{ partner.nameEn }}</div>
+              <div class="badge-ar">{{ partner.nameAr }}</div>
             </div>
           }
         </div>
+      } @empty {
+        <p>{{ locale.locale() === 'ar' ? 'لا يوجد شركاء حالياً.' : 'No partners available right now.' }}</p>
       }
     </div>
   </div>

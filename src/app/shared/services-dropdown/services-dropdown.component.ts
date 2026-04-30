@@ -1,15 +1,10 @@
-import { Component, OnInit, inject, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, DestroyRef, EventEmitter, OnInit, Output, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { DropdownModule } from 'primeng/dropdown';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
 
-interface ServiceOption {
-  id: string;
-  label_en: string;
-  label_ar: string;
-}
+import { PublicCatalogService, ServiceDto } from '../../services/public-catalog.service';
 
 @Component({
   selector: 'app-services-dropdown',
@@ -19,12 +14,13 @@ interface ServiceOption {
   styleUrls: ['./services-dropdown.component.scss']
 })
 export class ServicesDropdownComponent implements OnInit {
-  private readonly http = inject(HttpClient);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly publicCatalogService = inject(PublicCatalogService);
 
-  @Output() serviceSelected = new EventEmitter<ServiceOption>();
+  @Output() serviceSelected = new EventEmitter<ServiceDto>();
 
-  selectedService: ServiceOption | null = null;
-  services: ServiceOption[] = [];
+  selectedService: ServiceDto | null = null;
+  services: ServiceDto[] = [];
   isLoading = false;
   currentLanguage = 'en';
 
@@ -35,35 +31,18 @@ export class ServicesDropdownComponent implements OnInit {
 
   private loadServices(): void {
     this.isLoading = true;
-    // البيانات الثابتة للخدمات
-    this.services = [
-      {
-        id: 'economic-investment',
-        label_en: 'Economic and Investment Consultations',
-        label_ar: 'الاستشارات الاقتصادية والاستثمارية'
-      },
-      {
-        id: 'legal-economic',
-        label_en: 'Legal and Economic Consultations',
-        label_ar: 'الاستشارات القانونية والاقتصادية'
-      },
-      {
-        id: 'accounting-legal',
-        label_en: 'Accounting and Legal Consultations',
-        label_ar: 'الاستشارات المحاسبية والقانونية'
-      },
-      {
-        id: 'private-sector-health',
-        label_en: 'Referrals for Private Sector Health Reports - 3 Periods',
-        label_ar: 'إحالات لتقرير فحص القطاع الخاص خلال 3 فترات'
-      },
-      {
-        id: 'arab-research',
-        label_en: 'Arab Research Work and Comparative Studies for Companies',
-        label_ar: 'عمل الأبحاث العربية والدراسات المقارنة للشركات'
-      }
-    ];
-    this.isLoading = false;
+    this.publicCatalogService.services$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (services) => {
+          this.services = services;
+          this.isLoading = false;
+        },
+        error: () => {
+          this.services = [];
+          this.isLoading = false;
+        }
+      });
   }
 
   private detectLanguage(): void {
@@ -71,11 +50,11 @@ export class ServicesDropdownComponent implements OnInit {
     this.currentLanguage = htmlLang === 'ar' ? 'ar' : 'en';
   }
 
-  getServiceLabel(service: ServiceOption): string {
-    return this.currentLanguage === 'ar' ? service.label_ar : service.label_en;
+  getServiceLabel(service: ServiceDto): string {
+    return this.currentLanguage === 'ar' ? service.nameAr : service.nameEn;
   }
 
-  onServiceChange(event: any): void {
+  onServiceChange(): void {
     if (this.selectedService) {
       this.serviceSelected.emit(this.selectedService);
     }

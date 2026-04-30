@@ -61,6 +61,16 @@
                 (onClick)="openPackagesDialog(item)"
               ></p-button>
               <p-button
+                *ngIf="isServicesResource()"
+                type="button"
+                icon="pi pi-clock"
+                [text]="true"
+                [rounded]="true"
+                styleClass="row-action-trigger row-action-slots"
+                ariaLabel="Manage slots"
+                (onClick)="openSlotsDialog(item)"
+              ></p-button>
+              <p-button
                 type="button"
                 icon="pi pi-pencil"
                 [text]="true"
@@ -72,6 +82,7 @@
               <p-button
                 type="button"
                 icon="pi pi-trash"
+                *ngIf="!isSingleRecordResource()"
                 [text]="true"
                 [rounded]="true"
                 styleClass="row-action-trigger row-action-delete"
@@ -180,7 +191,26 @@
 
             <div class="crud-form-field">
               <label for="package-icon">Icon</label>
-              <input id="package-icon" type="text" formControlName="icon" placeholder="pi pi-star" />
+              <div class="file-upload-field">
+                <input
+                  #packageIconInput
+                  id="package-icon"
+                  type="file"
+                  accept="image/*"
+                  class="file-upload-input"
+                  (change)="onPackageIconSelected($event)"
+                />
+
+                <div class="file-upload-meta">
+                  <span>Select icon image to upload</span>
+                  <small>Stored inside server uploads folder</small>
+                </div>
+
+                <div class="file-preview-card" *ngIf="packageIconImage() as preview">
+                  <img [src]="preview" alt="Package icon" class="file-preview-image" />
+                  <button type="button" class="file-remove-btn" (click)="clearPackageIconSelection(packageIconInput)">Remove</button>
+                </div>
+              </div>
             </div>
 
             <div class="crud-form-field">
@@ -209,7 +239,14 @@
                 <td>{{ package['id'] }}</td>
                 <td>{{ package['nameEn'] || '-' }}</td>
                 <td>{{ package['nameAr'] || '-' }}</td>
-                <td>{{ package['icon'] || '-' }}</td>
+                <td>
+                  <ng-container *ngIf="getImageUrl(package, 'icon') as imageUrl; else noPackageIcon">
+                    <img [src]="imageUrl" alt="Package icon" class="table-image-preview" />
+                  </ng-container>
+                  <ng-template #noPackageIcon>
+                    <span>-</span>
+                  </ng-template>
+                </td>
                 <td>{{ getCurrencyValue(package, 'costAmount') | currency:'USD':'symbol':'1.2-2' }}</td>
                 <td class="actions-cell">
                   <button type="button" class="action-btn action-btn-edit" (click)="startEditPackage(package)">Edit</button>
@@ -221,6 +258,96 @@
             <ng-template pTemplate="emptymessage">
               <tr>
                 <td colspan="6" class="packages-empty-state">No packages added for this service yet.</td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </div>
+    </app-dialog-shell>
+
+    <app-dialog-shell
+      crud-dialog
+      [visible]="slotsDialogVisible()"
+      (visibleChange)="slotsDialogVisible.set($event)"
+      (onHide)="closeSlotsDialog()"
+      [header]="'Manage Available Slots - ' + selectedServiceSlotsLabel()"
+      [style]="{ width: 'min(860px, 92vw)' }"
+      styleClass="crud-packages-dialog"
+    >
+      <div class="packages-dialog" *ngIf="selectedServiceForSlots() as service">
+        <div class="packages-dialog-header">
+          <div>
+            <h3>Service Slots</h3>
+            <p>Set the available appointment times for <strong>{{ selectedServiceSlotsLabel() }}</strong>.</p>
+          </div>
+          <button type="button" class="btn btn-secondary package-reset-btn" [disabled]="slotSaving()" (click)="saveSlot()">
+            {{ slotHeaderActionLabel() }}
+          </button>
+        </div>
+
+        <form class="package-form-card" [formGroup]="slotForm" (ngSubmit)="saveSlot()">
+          <div class="package-form-grid">
+            <div class="crud-form-field">
+              <label for="slot-day">Day <span>*</span></label>
+              <input id="slot-day" type="date" formControlName="day" />
+              <small class="field-error" *ngIf="slotForm.controls.day.invalid && slotForm.controls.day.touched">Day is required.</small>
+            </div>
+
+            <div class="crud-form-field availability-field">
+              <label for="slot-available">Status</label>
+              <label class="availability-toggle">
+                <input id="slot-available" type="checkbox" formControlName="isAvailable" />
+                <span>{{ slotForm.controls.isAvailable.value ? 'Available' : 'Unavailable' }}</span>
+              </label>
+            </div>
+
+            <div class="crud-form-field">
+              <label for="slot-time-from">Time From <span>*</span></label>
+              <input id="slot-time-from" type="time" formControlName="timeFrom" />
+              <small class="field-error" *ngIf="slotForm.controls.timeFrom.invalid && slotForm.controls.timeFrom.touched">Start time is required.</small>
+            </div>
+
+            <div class="crud-form-field">
+              <label for="slot-time-to">Time To <span>*</span></label>
+              <input id="slot-time-to" type="time" formControlName="timeTo" />
+              <small class="field-error" *ngIf="slotForm.controls.timeTo.hasError('required') && slotForm.controls.timeTo.touched">End time is required.</small>
+              <small class="field-error" *ngIf="slotForm.controls.timeTo.hasError('invalidRange') && slotForm.controls.timeTo.touched">End time must be after start time.</small>
+            </div>
+          </div>
+        </form>
+
+        <div class="packages-table-wrap">
+          <p-table [value]="serviceSlots()" styleClass="admin-table packages-table prime-admin-table" responsiveLayout="scroll">
+            <ng-template pTemplate="header">
+              <tr>
+                <th>ID</th>
+                <th>DAY</th>
+                <th>TIME FROM</th>
+                <th>TIME TO</th>
+                <th>STATUS</th>
+                <th class="actions-column">ACTIONS</th>
+              </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-slot>
+              <tr>
+                <td>{{ slot['id'] }}</td>
+                <td>{{ slot['day'] || '-' }}</td>
+                <td>{{ formatSlotTime(slot['timeFrom']) }}</td>
+                <td>{{ formatSlotTime(slot['timeTo']) }}</td>
+                <td>
+                  <span class="status-pill" [class.status-pill-off]="!slot['isAvailable']">{{ slotAvailabilityLabel(slot) }}</span>
+                </td>
+                <td class="actions-cell">
+                  <button type="button" class="action-btn action-btn-edit" (click)="startEditSlot(slot)">Edit</button>
+                  <button type="button" class="action-btn action-btn-delete" [disabled]="slotSaving()" (click)="deleteSlot(slot)">Delete</button>
+                </td>
+              </tr>
+            </ng-template>
+
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="6" class="packages-empty-state">No slots added for this service yet.</td>
               </tr>
             </ng-template>
           </p-table>

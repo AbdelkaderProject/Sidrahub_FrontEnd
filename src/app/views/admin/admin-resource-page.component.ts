@@ -31,17 +31,24 @@ export class AdminResourcePageComponent implements OnInit {
   protected readonly dialogVisible = signal(false);
   protected readonly deleteDialogVisible = signal(false);
   protected readonly packagesDialogVisible = signal(false);
+  protected readonly slotsDialogVisible = signal(false);
   protected readonly saving = signal(false);
   protected readonly packageSaving = signal(false);
+  protected readonly slotSaving = signal(false);
   protected readonly currentId = signal<number | null>(null);
   protected readonly editingPackageId = signal<number | null>(null);
+  protected readonly editingSlotId = signal<number | null>(null);
   protected readonly selectedItemLabel = signal('');
   protected readonly selectedServiceForPackages = signal<Record<string, unknown> | null>(null);
+  protected readonly selectedServiceForSlots = signal<Record<string, unknown> | null>(null);
   protected readonly optionMap = signal<Record<string, AdminSelectOption[]>>({});
   protected readonly relationLookup = signal<Record<string, Record<string, string>>>({});
   protected readonly servicePackages = signal<Record<string, unknown>[]>([]);
+  protected readonly serviceSlots = signal<Record<string, unknown>[]>([]);
   protected readonly selectedFiles = signal<Record<string, File | null>>({});
   protected readonly selectedFilePreviews = signal<Record<string, string | null>>({});
+  protected readonly packageIconFile = signal<File | null>(null);
+  protected readonly packageIconPreview = signal<string | null>(null);
   protected readonly pageSizeOptions = [5, 10, 20, 50];
 
   protected readonly filteredItems = computed(() => {
@@ -50,6 +57,7 @@ export class AdminResourcePageComponent implements OnInit {
     return config?.singleRecord ? items.slice(0, 1) : items;
   });
   protected readonly isServicesResource = computed(() => this.config()?.key === 'services');
+  protected readonly isSingleRecordResource = computed(() => this.config()?.singleRecord === true);
   protected readonly showCreateButton = computed(() => {
     const config = this.config();
     if (!config?.singleRecord) {
@@ -65,6 +73,12 @@ export class AdminResourcePageComponent implements OnInit {
     nameEn: this.fb.nonNullable.control('', Validators.required),
     icon: this.fb.control<string | null>(''),
     costAmount: this.fb.nonNullable.control(0, [Validators.required, Validators.min(0)]),
+  });
+  protected readonly slotForm = this.fb.group({
+    day: this.fb.nonNullable.control('', Validators.required),
+    timeFrom: this.fb.nonNullable.control('', Validators.required),
+    timeTo: this.fb.nonNullable.control('', Validators.required),
+    isAvailable: this.fb.nonNullable.control(true),
   });
 
   async ngOnInit(): Promise<void> {
@@ -111,6 +125,13 @@ export class AdminResourcePageComponent implements OnInit {
     await this.refreshPackages();
   }
 
+  protected async openSlotsDialog(item: Record<string, unknown>): Promise<void> {
+    this.selectedServiceForSlots.set(item);
+    this.slotsDialogVisible.set(true);
+    this.startCreateSlot();
+    await this.refreshSlots();
+  }
+
   protected closeFormDialog(): void {
     this.dialogVisible.set(false);
     this.saving.set(false);
@@ -132,6 +153,21 @@ export class AdminResourcePageComponent implements OnInit {
       nameEn: '',
       icon: '',
       costAmount: 0,
+    });
+    this.resetPackageIconSelection();
+  }
+
+  protected closeSlotsDialog(): void {
+    this.slotsDialogVisible.set(false);
+    this.slotSaving.set(false);
+    this.editingSlotId.set(null);
+    this.selectedServiceForSlots.set(null);
+    this.serviceSlots.set([]);
+    this.slotForm.reset({
+      day: '',
+      timeFrom: '',
+      timeTo: '',
+      isAvailable: true,
     });
   }
 
@@ -253,6 +289,44 @@ export class AdminResourcePageComponent implements OnInit {
     return typeof currentValue === 'string' && currentValue.trim() !== '' ? this.api.resolveAssetUrl(currentValue) : null;
   }
 
+  protected onPackageIconSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0] ?? null;
+
+    this.packageIconFile.set(file);
+
+    if (!file) {
+      this.packageIconPreview.set(null);
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.packageIconPreview.set(String(reader.result ?? ''));
+    };
+    reader.readAsDataURL(file);
+  }
+
+  protected clearPackageIconSelection(input?: HTMLInputElement): void {
+    this.packageIconFile.set(null);
+    this.packageIconPreview.set(null);
+    this.packageForm.controls.icon.setValue('');
+
+    if (input) {
+      input.value = '';
+    }
+  }
+
+  protected packageIconImage(): string | null {
+    const preview = this.packageIconPreview();
+    if (preview) {
+      return preview;
+    }
+
+    const currentValue = this.packageForm.controls.icon.value;
+    return currentValue ? this.api.resolveAssetUrl(currentValue) : null;
+  }
+
   protected fieldOptions(field: AdminResourceFieldConfig): AdminSelectOption[] {
     return this.optionMap()[field.key] ?? field.staticOptions ?? [];
   }
@@ -274,6 +348,19 @@ export class AdminResourcePageComponent implements OnInit {
     return this.editingPackageId() ? 'Update Package' : 'Add Package';
   }
 
+  protected selectedServiceSlotsLabel(): string {
+    const service = this.selectedServiceForSlots();
+    return service ? this.pickLabel(service, ['nameEn', 'nameAr', 'id']) : 'Service';
+  }
+
+  protected slotHeaderActionLabel(): string {
+    if (this.slotSaving()) {
+      return 'Saving...';
+    }
+
+    return this.editingSlotId() ? 'Update Slot' : 'Add Slot';
+  }
+
   protected startCreatePackage(): void {
     this.editingPackageId.set(null);
     this.packageForm.reset({
@@ -282,6 +369,7 @@ export class AdminResourcePageComponent implements OnInit {
       icon: '',
       costAmount: 0,
     });
+    this.resetPackageIconSelection();
   }
 
   protected startEditPackage(item: Record<string, unknown>): void {
@@ -291,6 +379,28 @@ export class AdminResourcePageComponent implements OnInit {
       nameEn: String(item['nameEn'] ?? ''),
       icon: item['icon'] === null || item['icon'] === undefined ? '' : String(item['icon']),
       costAmount: Number(item['costAmount'] ?? 0),
+    });
+    this.packageIconFile.set(null);
+    this.packageIconPreview.set(null);
+  }
+
+  protected startCreateSlot(): void {
+    this.editingSlotId.set(null);
+    this.slotForm.reset({
+      day: '',
+      timeFrom: '',
+      timeTo: '',
+      isAvailable: true,
+    });
+  }
+
+  protected startEditSlot(item: Record<string, unknown>): void {
+    this.editingSlotId.set(Number(item['id']));
+    this.slotForm.reset({
+      day: String(item['day'] ?? ''),
+      timeFrom: this.normalizeTimeInput(item['timeFrom']),
+      timeTo: this.normalizeTimeInput(item['timeTo']),
+      isAvailable: Boolean(item['isAvailable']),
     });
   }
 
@@ -315,6 +425,11 @@ export class AdminResourcePageComponent implements OnInit {
 
     this.packageSaving.set(true);
     try {
+      if (this.packageIconFile()) {
+        const response = await firstValueFrom(this.api.uploadFile(this.packageIconFile() as File, 'service-packages'));
+        payload.icon = response.url;
+      }
+
       const packageId = this.editingPackageId();
       if (packageId) {
         await firstValueFrom(this.api.update('ServicePackages', packageId, payload));
@@ -348,6 +463,77 @@ export class AdminResourcePageComponent implements OnInit {
     }
   }
 
+  protected async saveSlot(): Promise<void> {
+    const service = this.selectedServiceForSlots();
+    if (!service) {
+      return;
+    }
+
+    this.slotForm.markAllAsTouched();
+    if (this.slotForm.invalid) {
+      return;
+    }
+
+    const timeFrom = this.slotForm.controls.timeFrom.value;
+    const timeTo = this.slotForm.controls.timeTo.value;
+    this.slotForm.controls.timeTo.setErrors(null);
+    if (timeTo <= timeFrom) {
+      this.slotForm.controls.timeTo.setErrors({ invalidRange: true });
+      this.slotForm.controls.timeTo.markAsTouched();
+      return;
+    }
+
+    const payload = {
+      serviceId: Number(service['id']),
+      day: this.slotForm.controls.day.value,
+      timeFrom,
+      timeTo,
+      isAvailable: this.slotForm.controls.isAvailable.value,
+    };
+
+    this.slotSaving.set(true);
+    try {
+      const slotId = this.editingSlotId();
+      if (slotId) {
+        await firstValueFrom(this.api.update('ServiceSlots', slotId, payload));
+      } else {
+        await firstValueFrom(this.api.create('ServiceSlots', payload));
+      }
+
+      this.startCreateSlot();
+      await this.refreshSlots();
+    } finally {
+      this.slotSaving.set(false);
+    }
+  }
+
+  protected async deleteSlot(item: Record<string, unknown>): Promise<void> {
+    const slotId = Number(item['id']);
+    if (!slotId || !window.confirm('Delete this slot?')) {
+      return;
+    }
+
+    this.slotSaving.set(true);
+    try {
+      await firstValueFrom(this.api.delete('ServiceSlots', slotId));
+      if (this.editingSlotId() === slotId) {
+        this.startCreateSlot();
+      }
+      await this.refreshSlots();
+    } finally {
+      this.slotSaving.set(false);
+    }
+  }
+
+  protected formatSlotTime(value: unknown): string {
+    const normalized = this.normalizeTimeInput(value);
+    return normalized || '-';
+  }
+
+  protected slotAvailabilityLabel(item: Record<string, unknown>): string {
+    return Boolean(item['isAvailable']) ? 'Available' : 'Unavailable';
+  }
+
   private async refresh(): Promise<void> {
     const config = this.config();
     if (!config) {
@@ -373,6 +559,26 @@ export class AdminResourcePageComponent implements OnInit {
     const serviceId = Number(service['id']);
     const data = await firstValueFrom(this.api.list<Record<string, unknown>>('ServicePackages'));
     this.servicePackages.set(data.filter((item) => Number(item['serviceId']) === serviceId));
+  }
+
+  private async refreshSlots(): Promise<void> {
+    const service = this.selectedServiceForSlots();
+    if (!service) {
+      this.serviceSlots.set([]);
+      return;
+    }
+
+    const serviceId = Number(service['id']);
+    const data = await firstValueFrom(this.api.list<Record<string, unknown>>('ServiceSlots'));
+    this.serviceSlots.set(
+      data
+        .filter((item) => Number(item['serviceId']) === serviceId)
+        .sort((left, right) => {
+          const leftKey = `${left['day'] ?? ''} ${left['timeFrom'] ?? ''}`;
+          const rightKey = `${right['day'] ?? ''} ${right['timeFrom'] ?? ''}`;
+          return leftKey.localeCompare(rightKey);
+        }),
+    );
   }
 
   private buildForm(config: AdminResourceConfig): void {
@@ -502,5 +708,18 @@ export class AdminResourcePageComponent implements OnInit {
   private resetFileSelections(): void {
     this.selectedFiles.set({});
     this.selectedFilePreviews.set({});
+  }
+
+  private resetPackageIconSelection(): void {
+    this.packageIconFile.set(null);
+    this.packageIconPreview.set(null);
+  }
+
+  private normalizeTimeInput(value: unknown): string {
+    if (value === null || value === undefined) {
+      return '';
+    }
+
+    return String(value).slice(0, 5);
   }
 }

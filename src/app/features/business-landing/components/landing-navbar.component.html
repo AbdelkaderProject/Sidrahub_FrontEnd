@@ -30,77 +30,38 @@
         </a>
         <div class="mega-menu" (mouseenter)="onMouseEnterDropdown()" (mouseleave)="onMouseLeaveDropdown()">
           <div class="mega-cats">
-            <div
-              class="mega-cat"
-              [class.active]="activeMega() === 'cat-company'"
-              (mouseenter)="setMega('cat-company')"
-              data-target="cat-company"
-            >
-              <div class="mega-cat__header">
-                <i data-lucide="chevron-down" class="mega-cat__chevron"></i>
-                <span>{{ locale.t('megaCatCompany') }}</span>
-              </div>
-              @if (activeMega() === 'cat-company') {
-                <div class="mega-inline-pane">
-                  <a href="/services/company-sa" class="mega-sublink">{{ locale.t('megaLinkCompanySa') }}</a>
-                  <a href="/services/company-dubai" class="mega-sublink">{{ locale.t('megaLinkCompanyDubai') }}</a>
+            @for (category of serviceCategories(); track category.id) {
+              <div
+                class="mega-cat"
+                [class.active]="activeMega() === category.id"
+                (mouseenter)="setMega(category.id)"
+              >
+                <div class="mega-cat__header">
+                  <i data-lucide="chevron-down" class="mega-cat__chevron"></i>
+                  <span>{{ getCategoryLabel(category) }}</span>
                 </div>
-              }
-            </div>
-            <div
-              class="mega-cat"
-              [class.active]="activeMega() === 'cat-legal'"
-              (mouseenter)="setMega('cat-legal')"
-              data-target="cat-legal"
-            >
-              <div class="mega-cat__header">
-                <i data-lucide="chevron-down" class="mega-cat__chevron"></i>
-                <span>{{ locale.t('megaCatLegal') }}</span>
+                @if (activeMega() === category.id) {
+                  <div class="mega-inline-pane">
+                    @for (service of category.services; track service.id) {
+                      <a
+                        [routerLink]="['/booking/consulting']"
+                        [queryParams]="{ serviceId: service.id }"
+                        class="mega-sublink"
+                        (click)="closeMobileMenu()"
+                      >
+                        {{ getServiceLabel(service) }}
+                      </a>
+                    }
+                  </div>
+                }
               </div>
-              @if (activeMega() === 'cat-legal') {
-                <div class="mega-inline-pane">
-                  <a href="/services/legal-packages" class="mega-sublink">{{ locale.t('megaLinkLegal') }}</a>
+            } @empty {
+              <div class="mega-cat active">
+                <div class="mega-cat__header">
+                  <span>{{ locale.locale() === 'ar' ? 'لا توجد تصنيفات متاحة' : 'No categories available' }}</span>
                 </div>
-              }
-            </div>
-            <div
-              class="mega-cat"
-              [class.active]="activeMega() === 'cat-financial'"
-              (mouseenter)="setMega('cat-financial')"
-              data-target="cat-financial"
-            >
-              <div class="mega-cat__header">
-                <i data-lucide="chevron-down" class="mega-cat__chevron"></i>
-                <span>{{ locale.t('megaCatFinancial') }}</span>
               </div>
-              @if (activeMega() === 'cat-financial') {
-                <div class="mega-inline-pane">
-                  <a href="/services/tax" class="mega-sublink">{{ locale.t('megaLinkTax') }}</a>
-                  <a href="/services/bookkeeping" class="mega-sublink">{{ locale.t('megaLinkBook') }}</a>
-                  <a href="/services/vat" class="mega-sublink">{{ locale.t('megaLinkVat') }}</a>
-                  <a href="/services/tax-report" class="mega-sublink">{{ locale.t('megaLinkTaxReport') }}</a>
-                </div>
-              }
-            </div>
-            <div
-              class="mega-cat"
-              [class.active]="activeMega() === 'cat-solutions'"
-              (mouseenter)="setMega('cat-solutions')"
-              data-target="cat-solutions"
-            >
-              <div class="mega-cat__header">
-                <i data-lucide="chevron-down" class="mega-cat__chevron"></i>
-                <span>{{ locale.t('megaCatSolutions') }}</span>
-              </div>
-              @if (activeMega() === 'cat-solutions') {
-                <div class="mega-inline-pane">
-                  <a href="/services/coworking" class="mega-sublink">{{ locale.t('megaLinkCoworking') }}</a>
-                  <a href="/services/hr" class="mega-sublink">{{ locale.t('megaLinkHr') }}</a>
-                  <a href="/services/trademark" class="mega-sublink">{{ locale.t('megaLinkTrademark') }}</a>
-                  <a href="/services/residency" class="mega-sublink">{{ locale.t('megaLinkResidency') }}</a>
-                </div>
-              }
-            </div>
+            }
           </div>
         </div>
       </li>

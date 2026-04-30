@@ -11,8 +11,17 @@ export function buildNavItems(isAdmin: boolean): INavData[] {
       title: true,
       name: 'Core Services'
     },
+    
+    
+    
     {
-      name: 'Service Categories',
+      name: 'Sidebars',
+      url: '/sidebars',
+      iconComponent: { name: 'cil-menu' }
+    },
+
+    {
+      name: 'Services',
       url: '/service-categories',
       iconComponent: { name: 'cil-tags' },
       children: [
@@ -41,17 +50,7 @@ export function buildNavItems(isAdmin: boolean): INavData[] {
         }
       ]
     },
-    
-    {
-      name: 'Sidebars',
-      url: '/sidebars',
-      iconComponent: { name: 'cil-menu' }
-    },
-    {
-      name: 'Company Profiles',
-      url: '/company-profiles',
-      iconComponent: { name: 'cil-building' }
-    },
+   
     {
       name: 'Team Members',
       url: '/team-members',
@@ -66,7 +65,12 @@ export function buildNavItems(isAdmin: boolean): INavData[] {
       name: 'Branches',
       url: '/branches',
       iconComponent: { name: 'cil-location-pin' }
-    }
+    },
+     {
+      name: 'Company Profiles',
+      url: '/company-profiles',
+      iconComponent: { name: 'cil-building' }
+    },
   ];
 
 

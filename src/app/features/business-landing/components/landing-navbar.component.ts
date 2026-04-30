@@ -1,16 +1,19 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   HostListener,
   OnDestroy,
   computed,
   inject,
   signal
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
 
 import { AuthService } from '../../../auth/auth.service';
 import { LandingLocaleService } from '../landing-locale.service';
+import { PublicCatalogService, ServiceCatalogItem } from '../../../services/public-catalog.service';
 
 interface Language {
   code: 'ar' | 'en';
@@ -30,6 +33,8 @@ export class LandingNavbarComponent implements OnDestroy {
   readonly locale = inject(LandingLocaleService);
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly publicCatalogService = inject(PublicCatalogService);
   private closeTimer: ReturnType<typeof setTimeout> | null = null;
   readonly languages: Language[] = [
     { code: 'ar', label: 'العربية', flagUrl: 'https://flagcdn.com/w40/sa.png', dir: 'rtl' },
@@ -42,14 +47,29 @@ export class LandingNavbarComponent implements OnDestroy {
   readonly isProfileDropdownOpen = signal(false);
   readonly isServicesDropdownOpen = signal(false);
   readonly isMobileMenuOpen = signal(false);
+  readonly serviceCategories = signal<Array<{ id: number; nameAr: string; nameEn: string; services: ServiceCatalogItem[] }>>([]);
+  readonly activeMega = signal<number | null>(null);
 
-  readonly activeMega = signal<
-    'cat-company' | 'cat-legal' | 'cat-financial' | 'cat-solutions'
-  >('cat-company');
+  constructor() {
+    this.publicCatalogService.catalogItems$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((items) => {
+        const grouped = this.buildServiceCategories(items);
+        this.serviceCategories.set(grouped);
 
-  setMega(
-    id: 'cat-company' | 'cat-legal' | 'cat-financial' | 'cat-solutions'
-  ): void {
+        if (!grouped.length) {
+          this.activeMega.set(null);
+          return;
+        }
+
+        const activeCategoryId = this.activeMega();
+        if (activeCategoryId === null || !grouped.some((category) => category.id === activeCategoryId)) {
+          this.activeMega.set(grouped[0].id);
+        }
+      });
+  }
+
+  setMega(id: number): void {
     this.activeMega.set(id);
   }
 
@@ -57,6 +77,9 @@ export class LandingNavbarComponent implements OnDestroy {
     if (this.closeTimer) {
       clearTimeout(this.closeTimer);
       this.closeTimer = null;
+    }
+    if (this.activeMega() === null && this.serviceCategories().length) {
+      this.activeMega.set(this.serviceCategories()[0].id);
     }
     this.isServicesDropdownOpen.set(true);
   }
@@ -132,6 +155,14 @@ export class LandingNavbarComponent implements OnDestroy {
     this.closeMobileMenu();
   }
 
+  getCategoryLabel(category: { nameAr: string; nameEn: string }): string {
+    return this.locale.locale() === 'ar' ? category.nameAr : category.nameEn;
+  }
+
+  getServiceLabel(service: ServiceCatalogItem): string {
+    return this.locale.locale() === 'ar' ? service.nameAr : service.nameEn;
+  }
+
   toggleLangDropdown(event?: MouseEvent): void {
     event?.stopPropagation();
     this.isLangDropdownOpen.update((value) => !value);
@@ -142,6 +173,31 @@ export class LandingNavbarComponent implements OnDestroy {
     this.isLangDropdownOpen.set(false);
     document.documentElement.dir = lang.dir;
     document.documentElement.lang = lang.code;
+  }
+
+  private buildServiceCategories(items: ServiceCatalogItem[]): Array<{ id: number; nameAr: string; nameEn: string; services: ServiceCatalogItem[] }> {
+    const grouped = new Map<number, { id: number; nameAr: string; nameEn: string; services: ServiceCatalogItem[] }>();
+
+    for (const item of items) {
+      if (!item.category) {
+        continue;
+      }
+
+      const existing = grouped.get(item.category.id);
+      if (existing) {
+        existing.services.push(item);
+        continue;
+      }
+
+      grouped.set(item.category.id, {
+        id: item.category.id,
+        nameAr: item.category.nameAr,
+        nameEn: item.category.nameEn,
+        services: [item]
+      });
+    }
+
+    return Array.from(grouped.values());
   }
 
   @HostListener('document:click', ['$event'])
