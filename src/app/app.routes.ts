@@ -7,6 +7,7 @@ import { AboutComponent } from './views/pages/about/about.component';
 import { ArticlesComponent } from './views/pages/articles/articles.component';
 import { ConsultingComponent } from './views/pages/consulting/consulting.component';
 import { HomeComponent } from './views/pages/home/home.component';
+import { ServiceDetailsComponent } from './views/pages/service-details/service-details.component';
 import { ContactComponent } from './views/pages/contact/contact.component';
 
 export const routes: Routes = [
@@ -50,6 +51,10 @@ export const routes: Routes = [
       {
         path: 'booking/consulting',
         component: ConsultingComponent
+      },
+      {
+        path: 'services/:id',
+        component: ServiceDetailsComponent
       }
     ]
   },
@@ -93,6 +98,10 @@ export const routes: Routes = [
       {
         path: 'booking/consulting',
         component: ConsultingComponent
+      },
+      {
+        path: 'services/:id',
+        component: ServiceDetailsComponent
       }
     ]
   },
@@ -146,6 +155,11 @@ export const routes: Routes = [
         path: 'company-profiles',
         loadComponent: () => import('./views/admin/admin-resource-page.component').then(m => m.AdminResourcePageComponent),
         data: { resourceKey: 'company-profiles' }
+      },
+      {
+        path: 'customer-reviews',
+        loadComponent: () => import('./views/admin/admin-resource-page.component').then(m => m.AdminResourcePageComponent),
+        data: { resourceKey: 'customer-reviews' }
       },
       {
         path: 'team-members',
@@ -206,6 +220,11 @@ export const routes: Routes = [
         path: 'admin/company-profiles',
         loadComponent: () => import('./views/admin/admin-resource-page.component').then(m => m.AdminResourcePageComponent),
         data: { resourceKey: 'company-profiles' }
+      },
+      {
+        path: 'admin/customer-reviews',
+        loadComponent: () => import('./views/admin/admin-resource-page.component').then(m => m.AdminResourcePageComponent),
+        data: { resourceKey: 'customer-reviews' }
       },
       {
         path: 'admin/localization',

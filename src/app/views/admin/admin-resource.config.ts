@@ -85,6 +85,32 @@ export const ADMIN_RESOURCE_CONFIGS: Record<string, AdminResourceConfig> = {
       { key: 'teamMembersNo', label: 'Team Members', type: 'number', required: true, min: 0 },
     ],
   },
+  'customer-reviews': {
+    key: 'customer-reviews',
+    title: 'Customer Reviews',
+    subtitle: 'Manage the reviews shown in the "Our Clients Opinions" section on the home page.',
+    endpoint: 'CustomerReviews',
+    icon: 'pi pi-comments',
+    tableTitle: 'Customer Reviews',
+    createLabel: 'Add Review',
+    emptyTitle: 'No customer reviews yet',
+    emptyMessage: 'Create a customer review to display it on the home page.',
+    searchKeys: ['id', 'nameAr', 'nameEn', 'opinionAr', 'opinionEn', 'urlStr'],
+    columns: [
+      { key: 'id', label: 'ID', type: 'number' },
+      { key: 'nameEn', label: 'Name (EN)' },
+      { key: 'nameAr', label: 'Name (AR)' },
+      { key: 'opinionEn', label: 'Opinion (EN)' },
+      { key: 'urlStr', label: 'Media URL' },
+    ],
+    formFields: [
+      { key: 'nameAr', label: 'Name (AR)', type: 'text', required: true },
+      { key: 'nameEn', label: 'Name (EN)', type: 'text', required: true },
+      { key: 'opinionAr', label: 'Opinion (AR)', type: 'textarea', required: true, rows: 4 },
+      { key: 'opinionEn', label: 'Opinion (EN)', type: 'textarea', required: true, rows: 4 },
+      { key: 'urlStr', label: 'Video File', type: 'file', accept: 'video/*', uploadFolder: 'customer-reviews' },
+    ],
+  },
   'service-categories': {
     key: 'service-categories',
     title: 'Service Categories',
@@ -277,3 +303,6 @@ export const ADMIN_RESOURCE_CONFIGS: Record<string, AdminResourceConfig> = {
 export function getAdminResourceConfig(key: string): AdminResourceConfig | undefined {
   return ADMIN_RESOURCE_CONFIGS[key];
 }
+
+
+

@@ -679,13 +679,17 @@
     position: absolute;
     inset: 0;
     opacity: 0;
-    transition: opacity 0.8s ease;
+    transition: opacity 0.8s ease, visibility 0.8s ease;
     display: flex;
+    pointer-events: none;
+    visibility: hidden;
   }
 
   .slide.active {
     opacity: 1;
     z-index: 1;
+    pointer-events: auto;
+    visibility: visible;
   }
 
   .slide-content-wrap {
@@ -1144,15 +1148,39 @@
     cursor: pointer;
   }
 
-  .vid-thumb img {
+  .vid-thumb--placeholder {
+    cursor: default;
+    background:
+      radial-gradient(circle at top, rgba(74, 222, 128, 0.32), transparent 45%),
+      linear-gradient(160deg, #f6fff9 0%, #d8f7e6 100%);
+  }
+
+  .vid-thumb--clickable {
+    cursor: pointer;
+  }
+
+  .vid-thumb img,
+  .vid-thumb video {
     width: 100%;
     height: 100%;
     object-fit: cover;
     transition: var(--transition);
   }
 
-  .vid-thumb:hover img {
+  .vid-thumb:hover img,
+  .vid-thumb:hover video {
     transform: scale(1.05);
+  }
+
+  .review-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--green-dark);
+    font-size: 5rem;
+    font-weight: 800;
   }
 
   .play-btn {
@@ -1185,13 +1213,13 @@
 
   .vid-role {
     color: var(--text-muted);
-    font-size: 0.85rem;
+    font-size: 0.95rem;
+    line-height: 1.8;
   }
 
   @media (max-width: 1024px) {
     .video-grid {
       grid-template-columns: repeat(2, 1fr);
-      aspect-ratio: 1 / 1;
     }
   }
 
@@ -1204,35 +1232,46 @@
   .modal {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.9);
+    background: rgba(0, 0, 0, 0.82);
     z-index: 1000;
     display: none;
     align-items: center;
     justify-content: center;
+    padding: 1.5rem;
   }
 
   .modal.active {
     display: flex;
   }
 
-  .modal-content {
-    width: 90%;
-    max-width: 400px;
-    aspect-ratio: 9 / 16;
+  .modal-content--video {
+    width: min(900px, 92vw);
+    background: #02110a;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 28px 64px rgba(0, 0, 0, 0.35);
+  }
+
+  .review-modal-video {
+    width: 100%;
+    max-height: 80vh;
+    display: block;
     background: #000;
-    border-radius: var(--radius-card);
-    position: relative;
   }
 
   .close-modal {
     position: absolute;
-    top: -40px;
-    right: 0;
+    top: 1rem;
+    right: 1rem;
+    width: 48px;
+    height: 48px;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.12);
     color: #fff;
     font-size: 2rem;
+    line-height: 1;
     cursor: pointer;
-    background: none;
-    border: none;
   }
 
   .team-sec {
@@ -1646,3 +1685,5 @@
   right: auto;
   left: 0;
 }
+
+

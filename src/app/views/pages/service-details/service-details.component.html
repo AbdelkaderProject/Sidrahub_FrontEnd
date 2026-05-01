@@ -1,0 +1,62 @@
+<section *ngIf="service$ | async as service; else notFound" class="service-details-page">
+  <section class="service-hero" [style.background-image]="'linear-gradient(rgba(19, 39, 95, 0.82), rgba(19, 39, 95, 0.82)), url(' + getHeroImage(service) + ')'">
+    <div class="service-hero__content">
+      <div class="service-hero__line"></div>
+      <h1>{{ getServiceName(service) }}</h1>
+      <div class="service-hero__breadcrumb">
+        <a routerLink="/home">{{ locale.locale() === 'ar' ? '????????' : 'Home' }}</a>
+        <span>/</span>
+        <span>{{ getServiceName(service) }}</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="service-overview">
+    <div class="service-container">
+      <div class="service-overview__header">
+        <div>
+          <div class="section-line"></div>
+          <h2>{{ locale.locale() === 'ar' ? '???? ???? ?? ??????' : 'Service Overview' }}</h2>
+        </div>
+      </div>
+      <p class="service-overview__description">{{ getServiceDescription(service) }}</p>
+
+      <div *ngIf="getSidebarTitle(service) as sidebarTitle" class="service-highlight">
+        <h3>{{ sidebarTitle }}</h3>
+        <p>{{ getSidebarDescription(service) }}</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="service-packages" *ngIf="service.packages.length > 0">
+    <div class="service-container">
+      <div class="service-packages__header">
+        <div class="section-line"></div>
+        <h2>{{ locale.locale() === 'ar' ? '???????' : 'Packages' }}</h2>
+      </div>
+
+      <div class="packages-grid">
+        <article class="package-card" *ngFor="let packageItem of service.packages">
+          <div class="package-card__icon">
+            <img *ngIf="getPackageIcon(packageItem) as iconUrl; else fallbackIcon" [src]="iconUrl" [alt]="getPackageName(packageItem)" />
+            <ng-template #fallbackIcon>
+              <div class="package-card__icon-fallback">PKG</div>
+            </ng-template>
+          </div>
+          <h3>{{ getPackageName(packageItem) }}</h3>
+          <div class="package-card__price">{{ packageItem.costAmount | currency:'SAR':'symbol':'1.0-0' }}</div>
+          <a [routerLink]="['/booking/consulting']" [queryParams]="{ serviceId: service.id, packageId: packageItem.id }" class="package-card__action">
+            {{ locale.locale() === 'ar' ? '?????? ??? ??????' : 'Get Package' }}
+          </a>
+        </article>
+      </div>
+    </div>
+  </section>
+</section>
+
+<ng-template #notFound>
+  <section class="service-not-found">
+    <h2>{{ locale.locale() === 'ar' ? '?????? ??? ??????' : 'Service not found' }}</h2>
+    <a routerLink="/home">{{ locale.locale() === 'ar' ? '?????? ????????' : 'Back to home' }}</a>
+  </section>
+</ng-template>

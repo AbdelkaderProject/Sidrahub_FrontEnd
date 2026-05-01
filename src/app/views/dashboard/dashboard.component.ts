@@ -23,20 +23,21 @@ interface QuickLink {
 })
 export class DashboardComponent {
   readonly title = 'SidraHub Admin Dashboard';
-  readonly subtitle = 'Unified workspace to manage company profile content, services, articles, partners, branches, and incoming orders.';
+  readonly subtitle = 'Unified workspace to manage company profile content, services, articles, customer reviews, partners, branches, and incoming orders.';
   readonly modulesTitle = 'SidraHub Modules';
   readonly modulesHint = 'Open any section to manage the content and records displayed across the SidraHub platform.';
-  readonly scenarioHint = 'Flow: update your company profile, publish services and articles, then track incoming client orders from one place.';
+  readonly scenarioHint = 'Flow: update your company profile, publish services and articles, add customer reviews, then track incoming client orders from one place.';
 
   readonly stats: DashboardStat[] = [
     { icon: 'pi pi-building', label: 'Company Profile', value: '1' },
     { icon: 'pi pi-briefcase', label: 'Published Services', value: '24+' },
-    { icon: 'pi pi-shopping-cart', label: 'Active Orders', value: '18' },
+    { icon: 'pi pi-comments', label: 'Customer Reviews', value: 'Home' },
     { icon: 'pi pi-users', label: 'Partners & Team', value: '12' }
   ];
 
   readonly quickLinks: QuickLink[] = [
     { route: '/company-profiles', title: 'Company Profile', description: 'Manage the main company identity, description, logo, and business metrics.' },
+    { route: '/customer-reviews', title: 'Customer Reviews', description: 'Add the reviews that appear in the "Our Clients Opinions" section on the home page.' },
     { route: '/services', title: 'Services', description: 'Manage services, categories, packages, and what appears to clients on the platform.' },
     { route: '/orders', title: 'Orders', description: 'Track submitted orders and follow up with clients from the admin dashboard.' },
     { route: '/partners', title: 'Partners', description: 'Manage partner logos and connect each partner to the company profile.' },

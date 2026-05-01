@@ -12,52 +12,28 @@
       <i data-lucide="chevron-right"></i>
     </button>
     <div class="slider-dots">
-      <div
-        class="dot"
-        [class.active]="currentSlide() === 0"
-        (click)="goToSlide(0)"
-        data-index="0"
-      ></div>
-      <div
-        class="dot"
-        [class.active]="currentSlide() === 1"
-        (click)="goToSlide(1)"
-        data-index="1"
-      ></div>
+      @for (slide of slides(); track slide.id; let idx = $index) {
+        <div class="dot" [class.active]="currentSlide() === idx" (click)="goToSlide(idx)"></div>
+      }
     </div>
   </div>
 
-  <div class="slide" [class.active]="currentSlide() === 0">
-    <div class="slide-content-wrap">
-      <div class="slide-text">
-        <h1>{{ locale.t('heroTitle') }}</h1>
-        <p>{{ locale.t('heroP1') }}</p>
-        <div class="hero-btns">
-          <a routerLink="/booking/consulting" class="btn btn-primary">{{ locale.t('consultFree') }}</a>
-          <a routerLink="/pages/login" class="btn btn-outline">{{ locale.t('ourServices') }}</a>
+  @for (slide of slides(); track slide.id; let idx = $index) {
+    <div class="slide" [class.active]="currentSlide() === idx">
+      <div class="slide-content-wrap">
+        <div class="slide-text">
+          <h1>{{ slide.title }}</h1>
+          <p>{{ slide.description }}</p>
+          <div class="hero-btns">
+            <a routerLink="/booking/consulting" class="btn btn-primary">{{ locale.t('consultFree') }}</a>
+            <a routerLink="/pages/login" class="btn btn-outline">{{ locale.t('ourServices') }}</a>
+          </div>
+        </div>
+        <div class="slide-image">
+          <div class="slide-stripe"></div>
+          <img [src]="slide.imageUrl" [alt]="slide.title" />
         </div>
       </div>
-      <div class="slide-image">
-        <div class="slide-stripe"></div>
-        <img src="https://picsum.photos/800/600?random=1" alt="" />
-      </div>
     </div>
-  </div>
-
-  <div class="slide" [class.active]="currentSlide() === 1">
-    <div class="slide-content-wrap">
-      <div class="slide-text">
-        <h1>{{ locale.t('heroTitle') }}</h1>
-        <p>{{ locale.t('heroP2') }}</p>
-        <div class="hero-btns">
-          <a routerLink="/booking/consulting" class="btn btn-primary">{{ locale.t('consultFree') }}</a>
-          <a routerLink="/pages/login" class="btn btn-outline">{{ locale.t('ourServices') }}</a>
-        </div>
-      </div>
-      <div class="slide-image">
-        <div class="slide-stripe"></div>
-        <img src="https://picsum.photos/800/600?random=2" alt="" />
-      </div>
-    </div>
-  </div>
+  }
 </section>

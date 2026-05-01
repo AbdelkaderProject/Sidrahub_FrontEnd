@@ -17,6 +17,7 @@ export class LandingServicesComponent {
   readonly locale = inject(LandingLocaleService);
   private readonly publicCatalogService = inject(PublicCatalogService);
   readonly catalogItems$ = this.publicCatalogService.catalogItems$;
+  readonly imageErrors = new Set<string>();
 
   trackByServiceId(_: number, service: ServiceCatalogItem): number {
     return service.id;
@@ -36,6 +37,20 @@ export class LandingServicesComponent {
 
   getServiceDescription(service: ServiceCatalogItem): string {
     return this.locale.locale() === 'ar' ? service.shortDescriptionAr : service.shortDescriptionEn;
+  }
+
+  getServiceIcon(service: ServiceCatalogItem): string | null {
+    return this.publicCatalogService.resolveAssetUrl(service.icon);
+  }
+
+  hasIconError(src: string | null): boolean {
+    return src ? this.imageErrors.has(src) : true;
+  }
+
+  onIconError(src: string | null): void {
+    if (src) {
+      this.imageErrors.add(src);
+    }
   }
 
   getSidebarTitle(service: ServiceCatalogItem): string | null {

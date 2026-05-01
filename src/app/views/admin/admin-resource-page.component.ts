@@ -289,6 +289,22 @@ export class AdminResourcePageComponent implements OnInit {
     return typeof currentValue === 'string' && currentValue.trim() !== '' ? this.api.resolveAssetUrl(currentValue) : null;
   }
 
+  protected isVideoField(field: AdminResourceFieldConfig): boolean {
+    return field.accept?.includes('video') ?? false;
+  }
+
+  protected isVideoPreview(preview: string | null, field: AdminResourceFieldConfig): boolean {
+    if (!preview) {
+      return false;
+    }
+
+    if (this.isVideoField(field)) {
+      return true;
+    }
+
+    return /\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(preview);
+  }
+
   protected onPackageIconSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0] ?? null;

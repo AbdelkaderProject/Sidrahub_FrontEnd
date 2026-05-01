@@ -5,6 +5,30 @@
   font-size: 1rem;
 }
 
+.service-icon-wrap {
+  width: 74px;
+  height: 74px;
+  margin: 0 auto 1rem;
+  border-radius: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, rgba(28, 168, 76, 0.12), rgba(28, 168, 76, 0.04));
+  border: 1px solid rgba(28, 168, 76, 0.16);
+}
+
+.service-icon-image {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+}
+
+.service-icon-fallback {
+  width: 30px;
+  height: 30px;
+  color: #1ca84c;
+}
+
 .service-category {
   display: inline-flex;
   align-items: center;
@@ -36,3 +60,13 @@
   font-size: 0.92rem;
   line-height: 1.7;
 }
+
+.service-title-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.service-title-link:hover {
+  color: #13275f;
+}
+

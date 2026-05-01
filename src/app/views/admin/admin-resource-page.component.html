@@ -122,12 +122,17 @@
               />
 
               <div class="file-upload-meta">
-                <span>Select image to upload</span>
+                <span>{{ isVideoField(field) ? 'Select video to upload' : 'Select image to upload' }}</span>
                 <small>Stored inside server uploads folder</small>
               </div>
 
               <div class="file-preview-card" *ngIf="getFilePreview(field.key) as preview">
-                <img [src]="preview" [alt]="field.label" class="file-preview-image" />
+                <ng-container *ngIf="isVideoPreview(preview, field); else imagePreview">
+                  <video [src]="preview" class="file-preview-video" controls preload="metadata"></video>
+                </ng-container>
+                <ng-template #imagePreview>
+                  <img [src]="preview" [alt]="field.label" class="file-preview-image" />
+                </ng-template>
                 <button type="button" class="file-remove-btn" (click)="clearFileSelection(field.key, fileInput)">Remove</button>
               </div>
             </div>

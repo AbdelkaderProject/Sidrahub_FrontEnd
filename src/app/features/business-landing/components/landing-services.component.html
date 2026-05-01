@@ -10,8 +10,19 @@
       @if (services?.length) {
         @for (service of services; track trackByServiceId($index, service)) {
           <div class="service-card">
+            <div class="service-icon-wrap">
+              @if (getServiceIcon(service); as serviceIcon) {
+                @if (!hasIconError(serviceIcon)) {
+                  <img [src]="serviceIcon" [alt]="getServiceName(service)" class="service-icon-image" (error)="onIconError(serviceIcon)" />
+                } @else {
+                  <i data-lucide="briefcase-business" class="service-icon-fallback"></i>
+                }
+              } @else {
+                <i data-lucide="briefcase-business" class="service-icon-fallback"></i>
+              }
+            </div>
             <div class="service-category">{{ getCategoryName(service) }}</div>
-            <h3 class="s-title">{{ getServiceName(service) }}</h3>
+            <h3 class="s-title"><a [routerLink]="['/services', service.id]" class="service-title-link">{{ getServiceName(service) }}</a></h3>
             <p class="s-desc">{{ getServiceDescription(service) }}</p>
 
             @if (getSidebarTitle(service); as sidebarTitle) {
@@ -21,7 +32,7 @@
               </div>
             }
 
-            <a [routerLink]="['/booking/consulting']" [queryParams]="{ serviceId: service.id }" class="s-link">
+            <a [routerLink]="['/services', service.id]" class="s-link">
               {{ locale.t('readMore') }}
               <i data-lucide="arrow-left"></i>
             </a>
@@ -35,3 +46,5 @@
     </div>
   </div>
 </section>
+
+

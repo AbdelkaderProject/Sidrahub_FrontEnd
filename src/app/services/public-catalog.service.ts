@@ -32,6 +32,15 @@ export interface SidebarDto {
   image: string | null;
 }
 
+export interface ServicePackageDto {
+  id: number;
+  serviceId: number;
+  nameAr: string;
+  nameEn: string;
+  icon: string | null;
+  costAmount: number;
+}
+
 export interface CompanyProfileDto {
   id: number;
   nameAr: string;
@@ -58,6 +67,15 @@ export interface BranchDto {
   addressEn: string;
   addressAr: string;
   phoneNumber: string;
+}
+
+export interface CustomerReviewDto {
+  id: number;
+  nameAr: string;
+  nameEn: string;
+  opinionAr: string;
+  opinionEn: string;
+  urlStr: string | null;
 }
 
 export interface PartnerDto {
@@ -97,6 +115,7 @@ export interface ServiceCatalogItem extends ServiceDto {
   category: ServiceCategoryDto | null;
   sidebars: SidebarDto[];
   primarySidebar: SidebarDto | null;
+  packages: ServicePackageDto[];
 }
 
 @Injectable({ providedIn: 'root' })
@@ -116,12 +135,20 @@ export class PublicCatalogService {
     .get<SidebarDto[]>(`${environment.apiUrl}/Sidebars`)
     .pipe(shareReplay({ bufferSize: 1, refCount: true }));
 
+  private readonly servicePackagesRequest$ = this.http
+    .get<ServicePackageDto[]>(`${environment.apiUrl}/ServicePackages`)
+    .pipe(shareReplay({ bufferSize: 1, refCount: true }));
+
   private readonly companyProfilesRequest$ = this.http
     .get<CompanyProfileDto[]>(`${environment.apiUrl}/CompanyProfiles`)
     .pipe(shareReplay({ bufferSize: 1, refCount: true }));
 
   private readonly branchesRequest$ = this.http
     .get<BranchDto[]>(`${environment.apiUrl}/Branches`)
+    .pipe(shareReplay({ bufferSize: 1, refCount: true }));
+
+  private readonly customerReviewsRequest$ = this.http
+    .get<CustomerReviewDto[]>(`${environment.apiUrl}/CustomerReviews`)
     .pipe(shareReplay({ bufferSize: 1, refCount: true }));
 
   private readonly partnersRequest$ = this.http
@@ -139,8 +166,10 @@ export class PublicCatalogService {
   readonly categories$ = this.categoriesRequest$;
   readonly services$ = this.servicesRequest$;
   readonly sidebars$ = this.sidebarsRequest$;
+  readonly servicePackages$ = this.servicePackagesRequest$;
   readonly companyProfiles$ = this.companyProfilesRequest$;
   readonly branches$ = this.branchesRequest$;
+  readonly customerReviews$ = this.customerReviewsRequest$;
   readonly partners$ = this.partnersRequest$;
   readonly teamMembers$ = this.teamMembersRequest$;
   readonly articles$ = this.articlesRequest$;
@@ -148,16 +177,19 @@ export class PublicCatalogService {
   readonly catalogItems$ = combineLatest([
     this.categoriesRequest$,
     this.servicesRequest$,
-    this.sidebarsRequest$
+    this.sidebarsRequest$,
+    this.servicePackagesRequest$
   ]).pipe(
-    map(([categories, services, sidebars]) =>
+    map(([categories, services, sidebars, packages]) =>
       services.map((service) => {
         const serviceSidebars = sidebars.filter((sidebar) => sidebar.serviceId === service.id);
+        const servicePackages = packages.filter((pkg) => pkg.serviceId === service.id);
         return {
           ...service,
           category: categories.find((category) => category.id === service.serviceCategoryId) ?? null,
           sidebars: serviceSidebars,
-          primarySidebar: serviceSidebars[0] ?? null
+          primarySidebar: serviceSidebars[0] ?? null,
+          packages: servicePackages
         } satisfies ServiceCatalogItem;
       })
     ),

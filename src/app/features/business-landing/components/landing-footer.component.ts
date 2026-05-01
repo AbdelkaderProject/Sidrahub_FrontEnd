@@ -16,6 +16,7 @@ import { refreshLucideIcons } from '../lucide-refresh';
   standalone: true,
   imports: [AsyncPipe, RouterLink],
   templateUrl: './landing-footer.component.html',
+  styleUrls: ['./landing-footer.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LandingFooterComponent {
@@ -24,6 +25,7 @@ export class LandingFooterComponent {
   readonly profiles$ = this.publicCatalogService.companyProfiles$;
   readonly branches$ = this.publicCatalogService.branches$;
   readonly services$ = this.publicCatalogService.services$;
+  readonly currentYear = new Date().getFullYear();
 
   constructor() {
     afterNextRender(() => {
@@ -43,6 +45,18 @@ export class LandingFooterComponent {
     return this.locale.locale() === 'ar' ? profile.descriptionAr : profile.descriptionEn;
   }
 
+  getProfileName(profile: CompanyProfileDto | null): string {
+    if (!profile) {
+      return `${this.locale.t('logoW1')} ${this.locale.t('logoW2')}`;
+    }
+
+    return this.locale.locale() === 'ar' ? profile.nameAr : profile.nameEn;
+  }
+
+  getProfileLogo(profile: CompanyProfileDto | null): string | null {
+    return this.publicCatalogService.resolveAssetUrl(profile?.logo);
+  }
+
   getServiceName(service: ServiceDto): string {
     return this.locale.locale() === 'ar' ? service.nameAr : service.nameEn;
   }
@@ -53,6 +67,16 @@ export class LandingFooterComponent {
 
   getBranchAddress(branch: BranchDto): string {
     return this.locale.locale() === 'ar' ? branch.addressAr : branch.addressEn;
+  }
+
+  getBranchColumns(branches: BranchDto[] | null): BranchDto[][] {
+    const items = branches ?? [];
+    if (items.length <= 2) {
+      return [items];
+    }
+
+    const midpoint = Math.ceil(items.length / 2);
+    return [items.slice(0, midpoint), items.slice(midpoint)];
   }
 
   normalizeWhatsApp(phone: string | null | undefined): string | null {

@@ -44,8 +44,7 @@
                   <div class="mega-inline-pane">
                     @for (service of category.services; track service.id) {
                       <a
-                        [routerLink]="['/booking/consulting']"
-                        [queryParams]="{ serviceId: service.id }"
+                        [routerLink]="['/services', service.id]"
                         class="mega-sublink"
                         (click)="closeMobileMenu()"
                       >
@@ -204,3 +203,5 @@
     }
   </div>
 </header>
+
+

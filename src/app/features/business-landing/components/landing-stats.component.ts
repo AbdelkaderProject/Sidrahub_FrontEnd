@@ -3,13 +3,17 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
+  effect,
   inject,
   OnDestroy,
   signal,
   viewChild,
   type WritableSignal
 } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { map } from 'rxjs';
 
+import { CompanyProfileDto, PublicCatalogService } from '../../../services/public-catalog.service';
 import { LandingLocaleService } from '../landing-locale.service';
 import { refreshLucideIcons } from '../lucide-refresh';
 
@@ -21,16 +25,34 @@ import { refreshLucideIcons } from '../lucide-refresh';
 })
 export class LandingStatsComponent implements AfterViewInit, OnDestroy {
   readonly locale = inject(LandingLocaleService);
+  private readonly publicCatalogService = inject(PublicCatalogService);
 
   readonly sectionEl = viewChild<ElementRef<HTMLElement>>('statsSection');
+  readonly companyProfile = toSignal<CompanyProfileDto | null>(
+    this.publicCatalogService.companyProfiles$.pipe(map((profiles) => profiles[0] ?? null)),
+    { initialValue: null }
+  );
 
   readonly n28 = signal(0);
   readonly n750 = signal(0);
   readonly n1300 = signal(0);
   readonly n60 = signal(0);
+  private readonly hasIntersected = signal(false);
 
   private observer: IntersectionObserver | null = null;
   private hasRun = false;
+
+  constructor() {
+    effect(() => {
+      const profile = this.companyProfile();
+      if (!this.hasIntersected() || this.hasRun || !profile) {
+        return;
+      }
+
+      this.hasRun = true;
+      this.runCounters(profile);
+    });
+  }
 
   ngAfterViewInit(): void {
     queueMicrotask(() => refreshLucideIcons());
@@ -39,14 +61,15 @@ export class LandingStatsComponent implements AfterViewInit, OnDestroy {
     if (!el) {
       return;
     }
+
     this.observer = new IntersectionObserver(
-      entries => {
-        if (!entries[0]?.isIntersecting || this.hasRun) {
+      (entries) => {
+        if (!entries[0]?.isIntersecting) {
           return;
         }
-        this.hasRun = true;
+
+        this.hasIntersected.set(true);
         queueMicrotask(() => refreshLucideIcons());
-        this.runCounters();
       },
       { threshold: 0.5 }
     );
@@ -57,11 +80,11 @@ export class LandingStatsComponent implements AfterViewInit, OnDestroy {
     this.observer?.disconnect();
   }
 
-  private runCounters(): void {
-    this.animateTo(this.n28, 28, 2000);
-    this.animateTo(this.n750, 750, 2000);
-    this.animateTo(this.n1300, 1300, 2000);
-    this.animateTo(this.n60, 60, 2000);
+  private runCounters(profile: CompanyProfileDto): void {
+    this.animateTo(this.n28, profile.yearExperienceNo, 2000);
+    this.animateTo(this.n750, profile.successStoryNo, 2000);
+    this.animateTo(this.n1300, profile.happyCustomerNo, 2000);
+    this.animateTo(this.n60, profile.teamMembersNo, 2000);
   }
 
   private animateTo(
