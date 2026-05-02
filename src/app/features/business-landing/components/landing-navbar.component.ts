@@ -10,10 +10,11 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
+import { combineLatest } from 'rxjs';
 
 import { AuthService } from '../../../auth/auth.service';
 import { LandingLocaleService } from '../landing-locale.service';
-import { PublicCatalogService, ServiceCatalogItem } from '../../../services/public-catalog.service';
+import { PublicCatalogService, ServiceCatalogItem, ServiceCategoryDto } from '../../../services/public-catalog.service';
 
 interface Language {
   code: 'ar' | 'en';
@@ -51,10 +52,10 @@ export class LandingNavbarComponent implements OnDestroy {
   readonly activeMega = signal<number | null>(null);
 
   constructor() {
-    this.publicCatalogService.catalogItems$
+    combineLatest([this.publicCatalogService.categories$, this.publicCatalogService.catalogItems$])
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((items) => {
-        const grouped = this.buildServiceCategories(items);
+      .subscribe(([categories, items]) => {
+        const grouped = this.buildServiceCategories(categories, items);
         this.serviceCategories.set(grouped);
 
         if (!grouped.length) {
@@ -186,29 +187,16 @@ export class LandingNavbarComponent implements OnDestroy {
     document.documentElement.lang = lang.code;
   }
 
-  private buildServiceCategories(items: ServiceCatalogItem[]): Array<{ id: number; nameAr: string; nameEn: string; services: ServiceCatalogItem[] }> {
-    const grouped = new Map<number, { id: number; nameAr: string; nameEn: string; services: ServiceCatalogItem[] }>();
-
-    for (const item of items) {
-      if (!item.category) {
-        continue;
-      }
-
-      const existing = grouped.get(item.category.id);
-      if (existing) {
-        existing.services.push(item);
-        continue;
-      }
-
-      grouped.set(item.category.id, {
-        id: item.category.id,
-        nameAr: item.category.nameAr,
-        nameEn: item.category.nameEn,
-        services: [item]
-      });
-    }
-
-    return Array.from(grouped.values());
+  private buildServiceCategories(
+    categories: ServiceCategoryDto[],
+    items: ServiceCatalogItem[]
+  ): Array<{ id: number; nameAr: string; nameEn: string; services: ServiceCatalogItem[] }> {
+    return categories.map((category) => ({
+      id: category.id,
+      nameAr: category.nameAr,
+      nameEn: category.nameEn,
+      services: items.filter((item) => item.category?.id === category.id)
+    }));
   }
 
   @HostListener('document:click', ['$event'])

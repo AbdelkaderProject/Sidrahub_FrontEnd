@@ -1,9 +1,10 @@
 import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 
 import { LandingLocaleService } from '../landing-locale.service';
-import { PublicCatalogService, ServiceCatalogItem } from '../../../services/public-catalog.service';
+import { PublicCatalogService, ServiceCatalogItem, ServiceCategoryDto } from '../../../services/public-catalog.service';
 
 interface ServiceCategoryCard {
   id: number;
@@ -25,6 +26,9 @@ export class LandingServicesComponent {
   readonly locale = inject(LandingLocaleService);
   private readonly publicCatalogService = inject(PublicCatalogService);
   readonly catalogItems$ = this.publicCatalogService.catalogItems$;
+  private readonly categories = toSignal(this.publicCatalogService.categories$ as any, {
+    initialValue: [] as ServiceCategoryDto[]
+  });
   readonly imageErrors = new Set<string>();
 
   trackByCategoryId(_: number, category: ServiceCategoryCard): number {
@@ -32,30 +36,20 @@ export class LandingServicesComponent {
   }
 
   buildCategoryCards(services: ServiceCatalogItem[]): ServiceCategoryCard[] {
-    const grouped = new Map<number, ServiceCategoryCard>();
+    const categories = (this.categories() ?? []) as ServiceCategoryDto[];
 
-    for (const service of services) {
-      const category = service.category;
-      if (!category) {
-        continue;
-      }
+    return categories.map((category: ServiceCategoryDto) => {
+      const linkedServices = services.filter((service) => service.category?.id === category.id);
+      const primaryService = linkedServices[0] ?? services.find((service) => service.category?.id === category.id) ?? null;
 
-      const current = grouped.get(category.id);
-      if (current) {
-        current.count += 1;
-        continue;
-      }
-
-      grouped.set(category.id, {
+      return {
         id: category.id,
-        name: this.getCategoryName(service),
-        description: this.getServiceDescription(service),
-        icon: this.getServiceIcon(service),
-        count: 1
-      });
-    }
-
-    return [...grouped.values()];
+        name: this.locale.locale() === 'ar' ? category.nameAr : category.nameEn,
+        description: primaryService ? this.getServiceDescription(primaryService) : '',
+        icon: primaryService ? this.getServiceIcon(primaryService) : null,
+        count: linkedServices.length
+      };
+    });
   }
 
   getServiceName(service: ServiceCatalogItem): string {
@@ -79,7 +73,7 @@ export class LandingServicesComponent {
   }
 
   getCategoryLink(_categoryId: number): string {
-    return this.locale.route('/services');
+    return this.locale.route(`/services?category=${_categoryId}`);
   }
 
   hasIconError(src: string | null): boolean {

@@ -19,6 +19,13 @@ interface HeroSlideView {
   imageUrl: string;
 }
 
+interface HeroCopy {
+  titleAr: string;
+  titleEn: string;
+  descriptionAr: string;
+  descriptionEn: string;
+}
+
 @Component({
   selector: 'app-landing-hero',
   standalone: true,
@@ -36,13 +43,30 @@ export class LandingHeroComponent {
   private readonly serviceRecords = toSignal(this.publicCatalogService.catalogItems$ as any, {
     initialValue: [] as ServiceCatalogItem[]
   });
+  private readonly heroCopies: HeroCopy[] = [
+    {
+      titleAr: 'منصة المتميز لخدمات الأعمال',
+      titleEn: 'SidraHub Business Platform',
+      descriptionAr: 'كل ما تحتاجه في مكان واحد بوابتك إلى التميز لتأسيس شركتك وتطوير أعمالك التجارية وتقديم الدعم الكامل لها.',
+      descriptionEn:
+        'Everything you need in one place. Your gateway to excellence for establishing your company, growing your business, and getting full support.'
+    },
+    {
+      titleAr: 'منصة المتميز لخدمات الأعمال',
+      titleEn: 'SidraHub Business Platform',
+      descriptionAr:
+        'اجمع كل خدماتك القانونية والمالية وخدمات العلاقات العامة في مكان واحد ووفر تكاليف التوظيف.',
+      descriptionEn:
+        'Bring your legal, financial, and public relations services together in one place and save hiring costs.'
+    }
+  ];
 
   readonly slides = computed(() => {
     const services = (this.serviceRecords() ?? []) as ServiceCatalogItem[];
     const slides = services
       .slice()
       .sort((left: ServiceCatalogItem, right: ServiceCatalogItem) => left.id - right.id)
-      .map((service) => this.mapService(service));
+      .map((service: ServiceCatalogItem, index: number) => this.mapService(service, index));
 
     if (slides.length > 0) {
       return slides;
@@ -96,20 +120,32 @@ export class LandingHeroComponent {
     this.heroPaused.set(paused);
   }
 
-  private mapService(service: ServiceCatalogItem): HeroSlideView {
-    const sidebar = service.primarySidebar ?? service.sidebars[0] ?? null;
+  private mapService(service: ServiceCatalogItem, index: number): HeroSlideView {
+    const copy = this.pickHeroCopy(index);
 
     return {
       id: service.id,
-      title: this.locale.locale() === 'ar' ? sidebar?.titleAr ?? service.nameAr : sidebar?.titleEn ?? service.nameEn,
+      title: copy.title,
+      description: copy.description,
+      imageUrl: this.publicCatalogService.resolveAssetUrl(service.icon) ?? 'https://picsum.photos/800/600?random=' + service.id
+    };
+  }
+
+  private pickHeroCopy(index: number): { title: string; description: string } {
+    const copy = this.heroCopies[index] ?? null;
+
+    if (copy) {
+      return this.locale.locale() === 'ar'
+        ? { title: copy.titleAr, description: copy.descriptionAr }
+        : { title: copy.titleEn, description: copy.descriptionEn };
+    }
+
+    return {
+      title: this.locale.locale() === 'ar' ? 'منصة المتميز لخدمات الأعمال' : 'SidraHub Business Platform',
       description:
         this.locale.locale() === 'ar'
-          ? sidebar?.descriptionAr ?? service.shortDescriptionAr
-          : sidebar?.descriptionEn ?? service.shortDescriptionEn,
-      imageUrl:
-        this.publicCatalogService.resolveAssetUrl(sidebar?.image) ??
-        this.publicCatalogService.resolveAssetUrl(service.icon) ??
-        'https://picsum.photos/800/600?random=' + service.id
+          ? 'كل ما تحتاجه في مكان واحد بوابتك إلى التميز لتأسيس شركتك وتطوير أعمالك التجارية وتقديم الدعم الكامل لها.'
+          : 'Everything you need in one place. Your gateway to excellence for establishing your company, growing your business, and getting full support.'
     };
   }
 

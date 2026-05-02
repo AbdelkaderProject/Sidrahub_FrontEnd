@@ -1,10 +1,11 @@
 import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { combineLatest, map } from 'rxjs';
 
 import { LandingLocaleService } from '../../../features/business-landing/landing-locale.service';
-import { PublicCatalogService, ServiceCatalogItem } from '../../../services/public-catalog.service';
+import { PublicCatalogService, ServiceCatalogItem, ServiceCategoryDto } from '../../../services/public-catalog.service';
 
 interface ServicesCategoryFilter {
   id: number;
@@ -30,6 +31,9 @@ export class ServicesComponent {
   readonly locale = inject(LandingLocaleService);
   private readonly publicCatalogService = inject(PublicCatalogService);
   private readonly route = inject(ActivatedRoute);
+  private readonly categories = toSignal(this.publicCatalogService.categories$ as any, {
+    initialValue: [] as ServiceCategoryDto[]
+  });
 
   readonly vm$ = combineLatest([this.publicCatalogService.catalogItems$, this.route.queryParamMap]).pipe(
     map(([services, queryParams]) => {
@@ -49,22 +53,13 @@ export class ServicesComponent {
   );
 
   private buildCategories(services: ServiceCatalogItem[]): ServicesCategoryFilter[] {
-    const grouped = new Map<number, ServicesCategoryFilter>();
+    const categories = (this.categories() ?? []) as ServiceCategoryDto[];
 
-    for (const service of services) {
-      const category = service.category;
-      if (!category || grouped.has(category.id)) {
-        continue;
-      }
-
-      grouped.set(category.id, {
-        id: category.id,
-        nameAr: category.nameAr,
-        nameEn: category.nameEn
-      });
-    }
-
-    return [...grouped.values()];
+    return categories.map((category: ServiceCategoryDto) => ({
+      id: category.id,
+      nameAr: category.nameAr,
+      nameEn: category.nameEn
+    }));
   }
 
   getCategoryName(category: ServicesCategoryFilter): string {

@@ -1,10 +1,11 @@
 import { AsyncPipe, CurrencyPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { combineLatest, map } from 'rxjs';
 
 import { LandingLocaleService } from '../../../features/business-landing/landing-locale.service';
-import { PublicCatalogService, ServiceCatalogItem, ServicePackageDto } from '../../../services/public-catalog.service';
+import { PublicCatalogService, ServiceCatalogItem, ServiceCategoryDto, ServicePackageDto } from '../../../services/public-catalog.service';
 
 interface ServiceCategoryFilter {
   id: number;
@@ -181,6 +182,9 @@ export class ServiceDetailsComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly publicCatalogService = inject(PublicCatalogService);
   readonly locale = inject(LandingLocaleService);
+  private readonly categories = toSignal(this.publicCatalogService.categories$ as any, {
+    initialValue: [] as ServiceCategoryDto[]
+  });
 
   readonly catalogItems$ = this.publicCatalogService.catalogItems$;
   readonly page$ = combineLatest([this.route.paramMap, this.publicCatalogService.catalogItems$]).pipe(
@@ -188,29 +192,14 @@ export class ServiceDetailsComponent {
   );
 
   buildCategories(services: ServiceCatalogItem[]): ServiceCategoryFilter[] {
-    const grouped = new Map<number, ServiceCategoryFilter>();
+    const categories = (this.categories() ?? []) as ServiceCategoryDto[];
 
-    for (const service of services) {
-      const category = service.category;
-      if (!category) {
-        continue;
-      }
-
-      const existing = grouped.get(category.id);
-      if (existing) {
-        existing.count += 1;
-        continue;
-      }
-
-      grouped.set(category.id, {
-        id: category.id,
-        nameAr: category.nameAr,
-        nameEn: category.nameEn,
-        count: 1
-      });
-    }
-
-    return [...grouped.values()];
+    return categories.map((category: ServiceCategoryDto) => ({
+      id: category.id,
+      nameAr: category.nameAr,
+      nameEn: category.nameEn,
+      count: services.filter((service) => service.category?.id === category.id).length
+    }));
   }
 
   getCategoryName(category: ServiceCategoryFilter): string {
