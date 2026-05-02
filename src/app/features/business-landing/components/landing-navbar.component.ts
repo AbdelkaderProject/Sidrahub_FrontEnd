@@ -159,6 +159,17 @@ export class LandingNavbarComponent implements OnDestroy {
     return this.locale.locale() === 'ar' ? category.nameAr : category.nameEn;
   }
 
+  getCategoryLink(categoryId: number): string {
+    return `${this.locale.route('/services')}?category=${categoryId}`;
+  }
+
+  goToCategory(categoryId: number, event?: MouseEvent): void {
+    event?.preventDefault();
+    this.router.navigateByUrl(this.getCategoryLink(categoryId));
+    this.closeMobileMenu();
+    this.isServicesDropdownOpen.set(false);
+  }
+
   getServiceLabel(service: ServiceCatalogItem): string {
     return this.locale.locale() === 'ar' ? service.nameAr : service.nameEn;
   }

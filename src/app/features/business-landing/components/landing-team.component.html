@@ -1,13 +1,11 @@
 <section class="team-sec">
-  @let members = teamMembers$ | async;
-
   <div class="bl-container">
     <div class="section-header">
       <div class="section-label">{{ locale.t('teamLabel') }}</div>
       <h2 class="section-title">{{ locale.t('teamTitle') }}</h2>
     </div>
     <div class="team-grid">
-      @for (member of members ?? []; track member.id) {
+      @for (member of displayedMembers(); track member.id) {
         <div class="team-card">
           <div class="team-media">
             <div class="team-img team-img--placeholder">

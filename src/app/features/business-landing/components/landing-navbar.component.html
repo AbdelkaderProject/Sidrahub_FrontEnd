@@ -36,10 +36,10 @@
                 [class.active]="activeMega() === category.id"
                 (mouseenter)="setMega(category.id)"
               >
-                <div class="mega-cat__header">
+                <a href="" class="mega-cat__header" (click)="goToCategory(category.id, $event)">
                   <i data-lucide="chevron-down" class="mega-cat__chevron"></i>
                   <span>{{ getCategoryLabel(category) }}</span>
-                </div>
+                </a>
                 @if (activeMega() === category.id) {
                   <div class="mega-inline-pane">
                     @for (service of category.services; track service.id) {

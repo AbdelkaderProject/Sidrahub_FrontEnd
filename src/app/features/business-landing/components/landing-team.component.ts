@@ -1,5 +1,5 @@
-import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 
 import { PublicCatalogService, TeamMemberDto } from '../../../services/public-catalog.service';
@@ -8,14 +8,15 @@ import { LandingLocaleService } from '../landing-locale.service';
 @Component({
   selector: 'app-landing-team',
   standalone: true,
-  imports: [AsyncPipe, RouterLink],
+  imports: [RouterLink],
   templateUrl: './landing-team.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LandingTeamComponent {
   readonly locale = inject(LandingLocaleService);
   private readonly publicCatalogService = inject(PublicCatalogService);
-  readonly teamMembers$ = this.publicCatalogService.teamMembers$;
+  readonly teamMembers = toSignal(this.publicCatalogService.teamMembers$, { initialValue: [] as TeamMemberDto[] });
+  readonly displayedMembers = computed(() => this.teamMembers().slice(0, 4));
 
   getMemberName(member: TeamMemberDto): string {
     return this.locale.locale() === 'ar' ? member.nameAr : member.nameEn;
