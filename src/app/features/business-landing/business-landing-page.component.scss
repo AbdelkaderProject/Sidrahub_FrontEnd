@@ -141,6 +141,32 @@
     color: var(--text-dark);
   }
 
+  .section-footer-link {
+    direction: ltr;
+    display: flex;
+    justify-content: flex-start;
+    margin-top: 1.5rem;
+  }
+
+  .section-footer-link a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    color: var(--green-base);
+    font-weight: 700;
+    transition: color 0.2s ease, transform 0.2s ease;
+  }
+
+  .section-footer-link a:hover {
+    color: var(--green-dark);
+    transform: translateX(-2px);
+  }
+
+  .section-footer-link i {
+    width: 18px;
+    height: 18px;
+  }
+
   .header {
     position: sticky;
     top: 0;

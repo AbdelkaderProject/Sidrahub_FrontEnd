@@ -5,7 +5,7 @@ export const environment = {
   production: false,
   
   // عنوان API
-  apiUrl: 'https://localhost:7011/api',
+  apiUrl: 'http://localhost:5210/api',
   
   // إعدادات التطبيق
   appName: 'Form Builder',

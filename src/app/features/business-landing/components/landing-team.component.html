@@ -47,5 +47,11 @@
         <p>{{ locale.locale() === 'ar' ? 'لا يوجد أعضاء فريق حالياً.' : 'No team members available right now.' }}</p>
       }
     </div>
+    <div class="section-footer-link">
+      <a [routerLink]="getAllTeamLink()">
+        <span>{{ locale.t('viewAll') }}</span>
+        <i data-lucide="arrow-left"></i>
+      </a>
+    </div>
   </div>
 </section>

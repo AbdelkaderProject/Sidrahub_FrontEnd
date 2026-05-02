@@ -6,72 +6,75 @@ import { combineLatest, map } from 'rxjs';
 import { LandingLocaleService } from '../../../features/business-landing/landing-locale.service';
 import { ArticleDto, PublicCatalogService, ServiceCategoryDto } from '../../../services/public-catalog.service';
 
-interface ArticleCategoryFilter {
+interface RelatedArticleVm {
   id: number;
-  name: string;
-  count: number;
+  title: string;
+  image: string;
 }
 
-interface ArticleCardVm {
+interface ArticleDetailsVm {
   id: number;
   title: string;
   summary: string;
+  description: string;
   image: string;
   categoryId: number | null;
   categoryName: string;
-}
-
-interface ArticlesPageVm {
-  categories: ArticleCategoryFilter[];
-  activeCategory: ArticleCategoryFilter | null;
-  articles: ArticleCardVm[];
+  relatedArticles: RelatedArticleVm[];
 }
 
 @Component({
-  selector: 'app-articles',
+  selector: 'app-article-details',
   standalone: true,
   imports: [AsyncPipe, RouterLink],
-  templateUrl: './articles.component.html',
-  styleUrl: './articles.component.css',
+  templateUrl: './article-details.component.html',
+  styleUrl: './article-details.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ArticlesComponent {
+export class ArticleDetailsComponent {
   private readonly publicCatalogService = inject(PublicCatalogService);
   private readonly route = inject(ActivatedRoute);
   readonly locale = inject(LandingLocaleService);
   readonly imageErrors = new Set<string>();
 
-  readonly vm$ = combineLatest([
+  readonly page$ = combineLatest([
     this.publicCatalogService.articles$,
     this.publicCatalogService.categories$,
-    this.route.queryParamMap
+    this.route.paramMap
   ]).pipe(
-    map(([articles, categories, queryParams]) => {
+    map(([articles, categories, params]) => {
+      const id = Number(params.get('id'));
+      if (!Number.isFinite(id)) {
+        return null;
+      }
+
+      const currentArticle = articles.find((article) => article.id === id);
+      if (!currentArticle) {
+        return null;
+      }
+
       const articleCards = articles.map((article) => this.toArticleCard(article, categories));
-      const categoryFilters = this.buildCategoryFilters(articleCards, categories);
-      const selectedCategoryId = Number(queryParams.get('category'));
-      const activeCategory = Number.isFinite(selectedCategoryId)
-        ? categoryFilters.find((category) => category.id === selectedCategoryId) ?? null
-        : null;
+      const currentCard = articleCards.find((article) => article.id === id) ?? this.toArticleCard(currentArticle, categories);
+      const relatedArticles = this.buildRelatedArticles(articleCards, currentCard.id, currentCard.categoryId);
 
       return {
-        categories: categoryFilters,
-        activeCategory,
-        articles: activeCategory ? articleCards.filter((article) => article.categoryId === activeCategory.id) : articleCards
-      } satisfies ArticlesPageVm;
+        ...currentCard,
+        description: this.getArticleDescription(currentArticle),
+        relatedArticles
+      } satisfies ArticleDetailsVm;
     })
   );
 
-  getCategoryLink(): string {
-    return this.locale.route('/blog');
+  getCategoryLink(categoryId?: number | null): string {
+    if (typeof categoryId !== 'number') {
+      return this.locale.route('/blog');
+    }
+
+    return this.locale.route(`/blog?category=${categoryId}`);
   }
 
-  getArticleLink(article: ArticleCardVm): string {
-    return this.locale.route(`/blog/${article.id}`);
-  }
-
-  resolveArticleImage(article: ArticleDto): string {
-    return this.publicCatalogService.resolveAssetUrl(article.image) ?? `https://picsum.photos/700/440?random=${article.id}`;
+  getArticleLink(articleId: number): string {
+    return this.locale.route(`/blog/${articleId}`);
   }
 
   hasArticleImageError(src: string | null): boolean {
@@ -84,7 +87,7 @@ export class ArticlesComponent {
     }
   }
 
-  private toArticleCard(article: ArticleDto, categories: ServiceCategoryDto[]): ArticleCardVm {
+  private toArticleCard(article: ArticleDto, categories: ServiceCategoryDto[]): ArticleDetailsVm {
     const categoryId = this.resolveArticleCategoryId(article, categories);
     const category = categoryId ? categories.find((item) => item.id === categoryId) ?? null : null;
 
@@ -92,47 +95,29 @@ export class ArticlesComponent {
       id: article.id,
       title: this.getArticleTitle(article),
       summary: this.getArticleSummary(article),
+      description: this.getArticleDescription(article),
       image: this.resolveArticleImage(article),
       categoryId,
-      categoryName: category ? this.getCategoryName(category) : this.locale.locale() === 'ar' ? 'مقال' : 'Article'
+      categoryName: category ? this.getCategoryName(category) : this.locale.locale() === 'ar' ? 'مقال' : 'Article',
+      relatedArticles: []
     };
   }
 
-  private buildCategoryFilters(articles: ArticleCardVm[], categories: ServiceCategoryDto[]): ArticleCategoryFilter[] {
-    const grouped = new Map<number, ArticleCategoryFilter>();
+  private buildRelatedArticles(articles: ArticleDetailsVm[], currentId: number, categoryId: number | null): RelatedArticleVm[] {
+    const ordered = articles
+      .filter((article) => article.id !== currentId)
+      .sort((left, right) => {
+        const leftScore = left.categoryId === categoryId ? 0 : 1;
+        const rightScore = right.categoryId === categoryId ? 0 : 1;
+        return leftScore - rightScore || left.id - right.id;
+      })
+      .slice(0, 4);
 
-    for (const category of categories) {
-      grouped.set(category.id, {
-        id: category.id,
-        name: this.getCategoryName(category),
-        count: 0
-      });
-    }
-
-    for (const article of articles) {
-      if (article.categoryId === null) {
-        continue;
-      }
-
-      const current = grouped.get(article.categoryId);
-      if (current) {
-        current.count += 1;
-      }
-    }
-
-    return [...grouped.values()];
-  }
-
-  getArticleTitle(article: ArticleDto): string {
-    return article.titleAr;
-  }
-
-  getArticleSummary(article: ArticleDto): string {
-    return article.shortDescriptionAr || article.descriptionAr;
-  }
-
-  getCategoryName(category: ServiceCategoryDto): string {
-    return this.locale.locale() === 'ar' ? category.nameAr : category.nameEn;
+    return ordered.map((article) => ({
+      id: article.id,
+      title: article.title,
+      image: article.image
+    }));
   }
 
   private resolveArticleCategoryId(article: ArticleDto, categories: ServiceCategoryDto[]): number | null {
@@ -150,13 +135,33 @@ export class ArticlesComponent {
     ].join(' '));
 
     for (const category of categories) {
-      const categoryTokens = this.getCategoryTokens(category);
-      if (categoryTokens.some((token) => token && searchText.includes(token))) {
+      const tokens = this.getCategoryTokens(category);
+      if (tokens.some((token) => token && searchText.includes(token))) {
         return category.id;
       }
     }
 
     return null;
+  }
+
+  private getArticleTitle(article: ArticleDto): string {
+    return this.locale.locale() === 'ar' ? article.titleAr : article.titleEn;
+  }
+
+  private getArticleSummary(article: ArticleDto): string {
+    return this.locale.locale() === 'ar' ? article.shortDescriptionAr || article.descriptionAr : article.shortDescriptionEn || article.descriptionEn;
+  }
+
+  private getArticleDescription(article: ArticleDto): string {
+    return this.locale.locale() === 'ar' ? article.descriptionAr : article.descriptionEn;
+  }
+
+  private getCategoryName(category: ServiceCategoryDto): string {
+    return this.locale.locale() === 'ar' ? category.nameAr : category.nameEn;
+  }
+
+  private resolveArticleImage(article: ArticleDto): string {
+    return this.publicCatalogService.resolveAssetUrl(article.image) ?? `https://picsum.photos/1400/780?random=${article.id}`;
   }
 
   private getCategoryTokens(category: ServiceCategoryDto): string[] {
@@ -165,7 +170,7 @@ export class ArticlesComponent {
     const tokens = new Set<string>([normalizedAr, normalizedEn]);
 
     if (normalizedAr.includes('تاسيس')) {
-      ['تاسيس', 'شركه', 'شركات', 'company', 'formation'].forEach((token) => tokens.add(token));
+      ['تاسيس', 'شركة', 'شركات', 'company', 'formation'].forEach((token) => tokens.add(token));
     }
 
     if (normalizedAr.includes('قانون')) {

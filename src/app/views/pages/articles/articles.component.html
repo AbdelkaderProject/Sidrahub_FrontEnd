@@ -1,61 +1,79 @@
-<section class="articles-hero">
-  <div class="articles-hero__overlay"></div>
-  <div class="articles-hero__content">
-    <h1>أخبارنا &amp; مقالات</h1>
-    <div class="breadcrumb">الرئيسية &gt; أخبارنا &amp; مقالات</div>
-  </div>
-</section>
+<section class="articles-page">
+  @let vm = vm$ | async;
 
-<section class="articles-section">
-  @let articles = articles$ | async;
+  <section class="articles-hero">
+    <div class="articles-hero__overlay"></div>
+    <div class="articles-hero__glow articles-hero__glow--left"></div>
+    <div class="articles-hero__glow articles-hero__glow--right"></div>
 
-  <div class="articles-container">
-    <aside class="articles-sidebar">
-      <h3>المقالات المتاحة</h3>
-      <div class="category-list">
-        @for (article of articles ?? []; track article.id) {
-          <div class="category-item category-item--static">
-            <span>{{ article.titleAr }}</span>
-          </div>
-        } @empty {
-          <div class="category-item category-item--static">
-            <span>لا توجد مقالات متاحة حالياً</span>
-          </div>
-        }
-      </div>
-    </aside>
-
-    <div class="articles-content">
-      <div class="articles-grid">
-        @for (article of articles ?? []; track article.id) {
-          <article class="article-card">
-            <div class="article-image-wrap">
-              <img [src]="getArticleImage(article)" [alt]="getArticleTitle(article)" />
-            </div>
-
-            <div class="article-topbar">
-              <span class="article-badge">مقال</span>
-              <div class="article-meta">
-                <span class="article-type">من قاعدة البيانات</span>
-                <span class="article-date">#{{ article.id }}</span>
-              </div>
-            </div>
-
-            <h2>{{ getArticleTitle(article) }}</h2>
-            <p>{{ getArticleSummary(article) }}</p>
-
-            <a href="#" class="read-more">
-              <span>قراءة المزيد</span>
-              <span class="read-more__arrow">←</span>
-            </a>
-          </article>
-        } @empty {
-          <article class="article-card article-card--empty">
-            <h2>لا توجد مقالات حالياً</h2>
-            <p>أضف مقالات من لوحة التحكم وستظهر هنا تلقائياً.</p>
-          </article>
-        }
-      </div>
+    <div class="articles-hero__content">
+      <div class="section-line section-line--light"></div>
+      <h1>أخبارنا &amp; مقالات</h1>
+      <div class="breadcrumb">الرئيسية <span>‹</span> أخبارنا &amp; مقالات</div>
     </div>
-  </div>
+  </section>
+
+  <section class="articles-shell">
+    <div class="articles-shell__inner">
+      <aside class="articles-sidebar">
+        <div class="articles-sidebar__panel">
+          <div class="articles-sidebar__eyebrow">تصفية حسب</div>
+
+          @for (category of vm?.categories ?? []; track category.id) {
+            <a
+              [routerLink]="getCategoryLink()"
+              [queryParams]="{ category: category.id }"
+              class="filter-chip"
+              [class.active]="vm?.activeCategory?.id === category.id">
+              <span>{{ category.name }}</span>
+            </a>
+          }
+        </div>
+      </aside>
+
+      <main class="articles-main">
+        @let articles = vm?.articles ?? [];
+        <div class="articles-grid">
+          @if (articles.length) {
+            @for (article of articles; track article.id) {
+              <article class="article-card">
+                <div class="article-card__media">
+                  @if (!hasArticleImageError(article.image)) {
+                    <img [src]="article.image" [alt]="article.title" (error)="onArticleImageError(article.image)" />
+                  } @else {
+                    <div class="article-card__fallback" aria-hidden="true">
+                      <i data-lucide="newspaper"></i>
+                    </div>
+                  }
+                </div>
+
+                <div class="article-card__top">
+                  <span class="article-card__badge">{{ article.categoryName }}</span>
+                  <span class="article-card__meta">#{{ article.id }}</span>
+                </div>
+
+                <div class="article-card__body">
+                  <h2>{{ article.title }}</h2>
+                  <p>{{ article.summary }}</p>
+                </div>
+
+                <a [routerLink]="getArticleLink(article)" class="article-card__more">
+                  <span>قراءة المزيد</span>
+                  <span class="article-card__arrow">←</span>
+                </a>
+              </article>
+            }
+          } @else {
+            <article class="article-card article-card--empty">
+              <div class="article-card__empty-icon">
+                <i data-lucide="file-text"></i>
+              </div>
+              <h2>لا توجد مقالات حالياً</h2>
+              <p>أضف أول مقال من لوحة التحكم وسيظهر هنا مع نفس التصميم تلقائياً.</p>
+            </article>
+          }
+        </div>
+      </main>
+    </div>
+  </section>
 </section>

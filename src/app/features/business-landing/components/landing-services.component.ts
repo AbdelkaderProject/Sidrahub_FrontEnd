@@ -5,6 +5,14 @@ import { RouterLink } from '@angular/router';
 import { LandingLocaleService } from '../landing-locale.service';
 import { PublicCatalogService, ServiceCatalogItem } from '../../../services/public-catalog.service';
 
+interface ServiceCategoryCard {
+  id: number;
+  name: string;
+  description: string;
+  icon: string | null;
+  count: number;
+}
+
 @Component({
   selector: 'app-landing-services',
   standalone: true,
@@ -19,8 +27,35 @@ export class LandingServicesComponent {
   readonly catalogItems$ = this.publicCatalogService.catalogItems$;
   readonly imageErrors = new Set<string>();
 
-  trackByServiceId(_: number, service: ServiceCatalogItem): number {
-    return service.id;
+  trackByCategoryId(_: number, category: ServiceCategoryCard): number {
+    return category.id;
+  }
+
+  buildCategoryCards(services: ServiceCatalogItem[]): ServiceCategoryCard[] {
+    const grouped = new Map<number, ServiceCategoryCard>();
+
+    for (const service of services) {
+      const category = service.category;
+      if (!category) {
+        continue;
+      }
+
+      const current = grouped.get(category.id);
+      if (current) {
+        current.count += 1;
+        continue;
+      }
+
+      grouped.set(category.id, {
+        id: category.id,
+        name: this.getCategoryName(service),
+        description: this.getServiceDescription(service),
+        icon: this.getServiceIcon(service),
+        count: 1
+      });
+    }
+
+    return [...grouped.values()];
   }
 
   getServiceName(service: ServiceCatalogItem): string {
@@ -43,6 +78,10 @@ export class LandingServicesComponent {
     return this.publicCatalogService.resolveAssetUrl(service.icon);
   }
 
+  getCategoryLink(_categoryId: number): string {
+    return this.locale.route('/services');
+  }
+
   hasIconError(src: string | null): boolean {
     return src ? this.imageErrors.has(src) : true;
   }
@@ -51,23 +90,5 @@ export class LandingServicesComponent {
     if (src) {
       this.imageErrors.add(src);
     }
-  }
-
-  getSidebarTitle(service: ServiceCatalogItem): string | null {
-    const sidebar = service.primarySidebar;
-    if (!sidebar) {
-      return null;
-    }
-
-    return this.locale.locale() === 'ar' ? sidebar.titleAr : sidebar.titleEn;
-  }
-
-  getSidebarDescription(service: ServiceCatalogItem): string | null {
-    const sidebar = service.primarySidebar;
-    if (!sidebar) {
-      return null;
-    }
-
-    return this.locale.locale() === 'ar' ? sidebar.descriptionAr : sidebar.descriptionEn;
   }
 }

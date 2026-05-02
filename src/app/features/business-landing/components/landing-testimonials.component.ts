@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 
 import { CustomerReviewDto, PublicCatalogService } from '../../../services/public-catalog.service';
@@ -9,7 +10,7 @@ import { refreshLucideIcons } from '../lucide-refresh';
 @Component({
   selector: 'app-landing-testimonials',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './landing-testimonials.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -62,5 +63,9 @@ export class LandingTestimonialsComponent {
 
   trackByReviewId(_: number, review: CustomerReviewDto): number {
     return review.id;
+  }
+
+  getAllReviewsLink(): string {
+    return this.locale.route('/reviews');
   }
 }

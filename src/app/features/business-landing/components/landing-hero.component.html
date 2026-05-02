@@ -26,12 +26,12 @@
           <p>{{ slide.description }}</p>
           <div class="hero-btns">
             <a routerLink="/booking/consulting" class="btn btn-primary">{{ locale.t('consultFree') }}</a>
-            <a routerLink="/pages/login" class="btn btn-outline">{{ locale.t('ourServices') }}</a>
+            <a [routerLink]="locale.route('/services')" class="btn btn-outline">{{ locale.t('ourServices') }}</a>
           </div>
         </div>
         <div class="slide-image">
           <div class="slide-stripe"></div>
-          <img [src]="slide.imageUrl" [alt]="slide.title" />
+          <img [src]="slide.imageUrl" alt="" aria-hidden="true" />
         </div>
       </div>
     </div>

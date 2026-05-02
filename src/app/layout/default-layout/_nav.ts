@@ -27,7 +27,7 @@ export function buildNavItems(isAdmin: boolean): INavData[] {
         },
         {
           name: 'Services',
-          url: '/services'
+          url: '/admin/services'
         }
       ]
     },

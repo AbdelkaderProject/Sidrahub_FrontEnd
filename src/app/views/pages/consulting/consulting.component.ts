@@ -1,6 +1,11 @@
-import { ChangeDetectionStrategy, Component, HostListener, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostListener, computed, effect, inject, signal, untracked } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NgFor, NgIf } from '@angular/common';
+import { Observable, startWith } from 'rxjs';
+
+import { LandingLocaleService } from '../../../features/business-landing/landing-locale.service';
+import { PublicCatalogService, ServiceCatalogItem, ServiceSlotDto } from '../../../services/public-catalog.service';
 
 interface CountryOption {
   name: string;
@@ -14,11 +19,25 @@ interface ServiceOption {
 }
 
 interface CalendarDay {
+  dateKey: string;
   dayNumber: number;
   dayName: string;
   monthLabel: string;
   fullLabel: string;
-  slots: string[];
+  slots: BookingSlot[];
+}
+
+interface BookingSlot {
+  id: number;
+  label: string;
+  timeFrom: string;
+  timeTo: string;
+}
+
+interface CalendarMonth {
+  year: number;
+  month: number;
+  label: string;
 }
 
 @Component({
@@ -31,6 +50,11 @@ interface CalendarDay {
 })
 export class ConsultingComponent {
   private readonly fb = inject(FormBuilder);
+  private readonly publicCatalogService = inject(PublicCatalogService);
+  readonly locale = inject(LandingLocaleService);
+  private readonly catalogItems = toSignal(this.publicCatalogService.catalogItems$ as any, {
+    initialValue: [] as unknown as ServiceCatalogItem[]
+  });
 
   readonly countries: CountryOption[] = [
     { name: 'أفغانستان', code: '+93', flagUrl: 'https://flagcdn.com/w40/af.png' },
@@ -230,7 +254,7 @@ export class ConsultingComponent {
     { name: 'زيمبابوي', code: '+263', flagUrl: 'https://flagcdn.com/w40/zw.png' }
   ];
 
-  readonly services: ServiceOption[] = [
+  readonly servicesFallback: ServiceOption[] = [
     { label: 'اختر الخدمة المناسبة', value: '' },
     { label: 'استشارات قانونية', value: 'legal' },
     { label: 'استشارات مالية وضريبية', value: 'finance' },
@@ -238,7 +262,34 @@ export class ConsultingComponent {
     { label: 'تأسيس شركات', value: 'company-setup' }
   ];
 
-  readonly scheduleDays: CalendarDay[] = [
+  readonly serviceOptions = computed<ServiceOption[]>(() => {
+    const services = (this.catalogItems() ?? []) as ServiceCatalogItem[];
+
+    if (!services.length) {
+      return this.servicesFallback.filter(service => service.value !== '');
+    }
+
+    const options: ServiceOption[] = [];
+
+    for (const service of services) {
+      const category = service.category;
+      if (!category) {
+        continue;
+      }
+
+      const categoryLabel = this.locale.locale() === 'ar' ? category.nameAr : category.nameEn;
+      const serviceLabel = this.locale.locale() === 'ar' ? service.nameAr : service.nameEn;
+
+      options.push({
+        label: `${categoryLabel} - ${serviceLabel}`,
+        value: String(service.id)
+      });
+    }
+
+    return options;
+  });
+
+  readonly scheduleDays: Array<Record<string, unknown>> = [
     {
       dayNumber: 6,
       dayName: 'الأحد',
@@ -365,8 +416,8 @@ export class ConsultingComponent {
   readonly selectedCountry = signal<CountryOption>(this.countries[0]);
   readonly isCountryDropdownOpen = signal(false);
   readonly currentStep = signal<1 | 2>(1);
-  readonly selectedDate = signal<CalendarDay>(this.scheduleDays[0]);
-  readonly selectedTime = signal(this.scheduleDays[0].slots[0]);
+  readonly selectedDate = signal<CalendarDay | null>(null);
+  readonly selectedTime = signal('');
   readonly isConfirmationOpen = signal(false);
 
   readonly consultingForm = this.fb.group({
@@ -377,12 +428,155 @@ export class ConsultingComponent {
     message: ['', Validators.required]
   });
 
-  readonly selectedServiceLabel = computed(() => {
-    const selectedValue = this.consultingForm.controls.service.value;
-    return this.services.find(service => service.value === selectedValue)?.label ?? 'استشارة مجانية';
+  private readonly serviceValue = toSignal(
+    this.consultingForm.controls.service.valueChanges.pipe(startWith(this.consultingForm.controls.service.value ?? '')),
+    { initialValue: this.consultingForm.controls.service.value ?? '' }
+  );
+
+  private readonly phoneValue = toSignal(
+    this.consultingForm.controls.phone.valueChanges.pipe(startWith(this.consultingForm.controls.phone.value ?? '')),
+    { initialValue: this.consultingForm.controls.phone.value ?? '' }
+  );
+
+  private readonly serviceSlots = toSignal(this.publicCatalogService.serviceSlots$ as Observable<ServiceSlotDto[]>, {
+    initialValue: [] as ServiceSlotDto[]
   });
 
-  readonly customerPhone = computed(() => `${this.selectedCountry().code} ${this.consultingForm.controls.phone.value ?? ''}`.trim());
+  readonly currentMonthIndex = signal(0);
+
+  readonly selectedServiceId = computed(() => {
+    const value = Number(this.serviceValue());
+    return Number.isFinite(value) && value > 0 ? value : null;
+  });
+
+  readonly availableSlots = computed(() => {
+    const serviceId = this.selectedServiceId();
+    if (serviceId === null) {
+      return [] as ServiceSlotDto[];
+    }
+
+    return [...((this.serviceSlots() ?? []) as ServiceSlotDto[])]
+      .filter(slot => slot.serviceId === serviceId && slot.isAvailable)
+      .sort((left, right) => {
+        const leftDay = this.parseDateOnly(left.day).getTime();
+        const rightDay = this.parseDateOnly(right.day).getTime();
+        if (leftDay !== rightDay) {
+          return leftDay - rightDay;
+        }
+
+        return this.parseTimeOnly(left.timeFrom) - this.parseTimeOnly(right.timeFrom);
+      });
+  });
+
+  readonly availableMonths = computed(() => {
+    const months = new Map<string, CalendarMonth>();
+
+    for (const slot of this.availableSlots()) {
+      const date = this.parseDateOnly(slot.day);
+      const key = `${date.getFullYear()}-${date.getMonth()}`;
+      if (!months.has(key)) {
+        months.set(key, {
+          year: date.getFullYear(),
+          month: date.getMonth(),
+          label: this.formatMonthYear(date)
+        });
+      }
+    }
+
+    return [...months.values()].sort((left, right) => (left.year - right.year) || (left.month - right.month));
+  });
+
+  readonly activeMonth = computed(() => this.availableMonths()[this.currentMonthIndex()] ?? null);
+
+  readonly calendarRowsDynamic = computed(() => {
+    const activeMonth = this.activeMonth();
+    if (!activeMonth) {
+      return [] as number[][];
+    }
+
+    const firstDay = new Date(activeMonth.year, activeMonth.month, 1, 12);
+    const totalDays = new Date(activeMonth.year, activeMonth.month + 1, 0).getDate();
+    const offset = (firstDay.getDay() + 1) % 7;
+    const rows: number[][] = [];
+    let currentRow: number[] = [];
+
+    for (let index = 0; index < offset; index += 1) {
+      currentRow.push(0);
+    }
+
+    for (let day = 1; day <= totalDays; day += 1) {
+      currentRow.push(day);
+      if (currentRow.length === 7) {
+        rows.push(currentRow);
+        currentRow = [];
+      }
+    }
+
+    if (currentRow.length > 0) {
+      while (currentRow.length < 7) {
+        currentRow.push(0);
+      }
+      rows.push(currentRow);
+    }
+
+    return rows;
+  });
+
+  readonly availableDays = computed<CalendarDay[]>(() => {
+    const activeMonth = this.activeMonth();
+    if (!activeMonth) {
+      return [];
+    }
+
+    const groupedDays = new Map<string, { date: Date; slots: BookingSlot[] }>();
+
+    for (const slot of this.availableSlots()) {
+      const date = this.parseDateOnly(slot.day);
+      if (date.getFullYear() !== activeMonth.year || date.getMonth() !== activeMonth.month) {
+        continue;
+      }
+
+      const dateKey = this.toDateKey(date);
+      const current = groupedDays.get(dateKey) ?? { date, slots: [] };
+      current.slots.push({
+        id: slot.id,
+        label: this.formatTimeRange(slot.timeFrom, slot.timeTo),
+        timeFrom: slot.timeFrom,
+        timeTo: slot.timeTo
+      });
+      groupedDays.set(dateKey, current);
+    }
+
+    return [...groupedDays.entries()]
+      .sort((left, right) => left[1].date.getTime() - right[1].date.getTime())
+      .map(([dateKey, group]) => this.mapDateToCalendarDay(dateKey, group.date, group.slots));
+  });
+
+  readonly monthTitle = computed(() => this.activeMonth()?.label ?? '');
+
+  private readonly bookingSyncEffect = effect(() => {
+    if (this.currentStep() !== 2) {
+      return;
+    }
+
+    this.availableDays();
+    this.availableMonths();
+    untracked(() => this.syncSelectedDateWithCurrentMonth());
+  });
+
+  selectedServiceLabel(): string {
+    const selectedValue = this.serviceValue();
+    const service = this.serviceOptions().find(option => option.value === selectedValue);
+    if (service) {
+      return service.label;
+    }
+
+    return this.locale.locale() === 'ar' ? 'استشارة مجانية' : 'Free consultation';
+  }
+
+  customerPhone(): string {
+    return `${this.selectedCountry().code} ${this.phoneValue() ?? ''}`.trim();
+  }
 
   toggleCountryDropdown(): void {
     this.isCountryDropdownOpen.update(value => !value);
@@ -398,6 +592,7 @@ export class ConsultingComponent {
     if (this.consultingForm.invalid) {
       return;
     }
+    this.prepareScheduleSelection();
     this.currentStep.set(2);
   }
 
@@ -407,15 +602,26 @@ export class ConsultingComponent {
 
   selectDate(day: CalendarDay): void {
     this.selectedDate.set(day);
-    this.selectedTime.set(day.slots[0]);
+    this.selectedTime.set(day.slots[0]?.label ?? '');
   }
 
-  selectTime(slot: string): void {
-    this.selectedTime.set(slot);
+  selectMonth(direction: -1 | 1): void {
+    const nextIndex = this.currentMonthIndex() + direction;
+    const months = this.availableMonths();
+    if (nextIndex < 0 || nextIndex >= months.length) {
+      return;
+    }
+
+    this.currentMonthIndex.set(nextIndex);
+    this.syncSelectedDateWithCurrentMonth();
+  }
+
+  selectTime(slot: BookingSlot): void {
+    this.selectedTime.set(slot.label);
   }
 
   confirmBooking(): void {
-    if (!this.selectedTime()) {
+    if (!this.selectedDate() || !this.selectedTime()) {
       return;
     }
     this.isConfirmationOpen.set(true);
@@ -430,12 +636,13 @@ export class ConsultingComponent {
     this.currentStep.set(1);
     this.consultingForm.reset();
     this.selectedCountry.set(this.countries[0]);
-    this.selectedDate.set(this.scheduleDays[0]);
-    this.selectedTime.set(this.scheduleDays[0].slots[0]);
+    this.currentMonthIndex.set(0);
+    this.selectedDate.set(null);
+    this.selectedTime.set('');
   }
 
   getDay(dayNumber: number): CalendarDay | undefined {
-    return this.scheduleDays.find(day => day.dayNumber === dayNumber);
+    return this.availableDays().find(day => day.dayNumber === dayNumber);
   }
 
   hasError(controlName: 'name' | 'phone' | 'email' | 'service' | 'message'): boolean {
@@ -453,4 +660,102 @@ export class ConsultingComponent {
       this.isConfirmationOpen.set(false);
     }
   }
+
+  private prepareScheduleSelection(): void {
+    this.currentMonthIndex.set(0);
+    this.syncSelectedDateWithCurrentMonth();
+  }
+
+  private syncSelectedDateWithCurrentMonth(): void {
+    const months = this.availableMonths();
+    if (!months.length) {
+      this.currentMonthIndex.set(0);
+      this.selectedDate.set(null);
+      this.selectedTime.set('');
+      return;
+    }
+
+    if (this.currentMonthIndex() >= months.length) {
+      this.currentMonthIndex.set(0);
+      return;
+    }
+
+    const days = this.availableDays();
+    if (!days.length) {
+      this.selectedDate.set(null);
+      this.selectedTime.set('');
+      return;
+    }
+
+    const currentDate = this.selectedDate();
+    const matchedDate = currentDate ? days.find(day => day.dateKey === currentDate.dateKey) ?? null : null;
+    const nextDate = matchedDate ?? days[0];
+    this.selectedDate.set(nextDate);
+
+    const currentSlot = this.selectedTime();
+    const matchingSlot = currentSlot
+      ? nextDate.slots.find(slot => slot.label === currentSlot) ?? null
+      : null;
+    this.selectedTime.set(matchingSlot?.label ?? nextDate.slots[0]?.label ?? '');
+  }
+
+  private mapDateToCalendarDay(dateKey: string, date: Date, slots: BookingSlot[]): CalendarDay {
+    return {
+      dateKey,
+      dayNumber: date.getDate(),
+      dayName: this.formatDayName(date),
+      monthLabel: this.formatMonthName(date),
+      fullLabel: this.formatFullDateLabel(date),
+      slots
+    };
+  }
+
+  private parseDateOnly(value: string): Date {
+    const [year, month, day] = value.split('-').map(Number);
+    return new Date(year, (month ?? 1) - 1, day ?? 1, 12, 0, 0);
+  }
+
+  private toDateKey(date: Date): string {
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+  }
+
+  private parseTimeOnly(value: string): number {
+    const [hours = '0', minutes = '0'] = value.split(':');
+    return Number(hours) * 60 + Number(minutes);
+  }
+
+  private formatDayName(date: Date): string {
+    return new Intl.DateTimeFormat('ar-EG', { weekday: 'long' }).format(date);
+  }
+
+  private formatMonthName(date: Date): string {
+    return new Intl.DateTimeFormat('ar-EG', { month: 'long' }).format(date);
+  }
+
+  private formatMonthYear(date: Date): string {
+    return `${this.formatMonthName(date)} ${date.getFullYear()}`;
+  }
+
+  private formatFullDateLabel(date: Date): string {
+    return new Intl.DateTimeFormat('ar-EG', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    }).format(date);
+  }
+
+  private formatTimeRange(timeFrom: string, timeTo: string): string {
+    return `${this.formatTime(timeFrom)} - ${this.formatTime(timeTo)}`;
+  }
+
+  private formatTime(value: string): string {
+    const [hours = '0', minutes = '0'] = value.split(':');
+    const date = new Date(2000, 0, 1, Number(hours), Number(minutes), 0);
+    return new Intl.DateTimeFormat('ar-EG', {
+      hour: 'numeric',
+      minute: '2-digit'
+    }).format(date);
+  }
 }
+

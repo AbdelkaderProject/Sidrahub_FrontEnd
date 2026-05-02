@@ -5,10 +5,14 @@ import { loginGuard } from './auth/login.guard';
 import { PublicLayoutComponent } from './shared/layouts/public-layout.component';
 import { AboutComponent } from './views/pages/about/about.component';
 import { ArticlesComponent } from './views/pages/articles/articles.component';
+import { ArticleDetailsComponent } from './views/pages/article-details/article-details.component';
 import { ConsultingComponent } from './views/pages/consulting/consulting.component';
 import { HomeComponent } from './views/pages/home/home.component';
 import { ServiceDetailsComponent } from './views/pages/service-details/service-details.component';
 import { ContactComponent } from './views/pages/contact/contact.component';
+import { ReviewsComponent } from './views/pages/reviews/reviews.component';
+import { ServicesComponent } from './views/pages/services/services.component';
+import { TeamComponent } from './views/pages/team/team.component';
 
 export const routes: Routes = [
   {
@@ -45,12 +49,32 @@ export const routes: Routes = [
         component: ArticlesComponent
       },
       {
+        path: 'blog/:id',
+        component: ArticleDetailsComponent
+      },
+      {
+        path: 'articles/:id',
+        component: ArticleDetailsComponent
+      },
+      {
         path: 'blog',
         component: ArticlesComponent
       },
       {
         path: 'booking/consulting',
         component: ConsultingComponent
+      },
+      {
+        path: 'services',
+        component: ServicesComponent
+      },
+      {
+        path: 'reviews',
+        component: ReviewsComponent
+      },
+      {
+        path: 'team',
+        component: TeamComponent
       },
       {
         path: 'services/:id',
@@ -92,12 +116,32 @@ export const routes: Routes = [
         component: ArticlesComponent
       },
       {
+        path: 'blog/:id',
+        component: ArticleDetailsComponent
+      },
+      {
+        path: 'articles/:id',
+        component: ArticleDetailsComponent
+      },
+      {
         path: 'blog',
         component: ArticlesComponent
       },
       {
         path: 'booking/consulting',
         component: ConsultingComponent
+      },
+      {
+        path: 'services',
+        component: ServicesComponent
+      },
+      {
+        path: 'reviews',
+        component: ReviewsComponent
+      },
+      {
+        path: 'team',
+        component: TeamComponent
       },
       {
         path: 'services/:id',

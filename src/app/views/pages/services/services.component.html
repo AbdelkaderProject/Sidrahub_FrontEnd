@@ -1,0 +1,66 @@
+<section class="services-page">
+  @let vm = vm$ | async;
+
+  <section class="services-hero">
+    <div class="services-container services-hero__content">
+      <div class="section-line"></div>
+      <h1>{{ locale.t('servicesPageTitle') }}</h1>
+      <div class="breadcrumb">
+        <a [routerLink]="locale.route('/home')">{{ locale.t('servicesBackToHome') }}</a>
+        <span>/</span>
+        <span>{{ locale.t('servicesPageTitle') }}</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="services-main">
+    <div class="services-container services-layout">
+      <main class="services-listing">
+        <div class="services-grid">
+          @if (vm?.services?.length) {
+            @for (service of vm?.services; track trackByServiceId($index, service)) {
+              <article class="service-card">
+                <div class="service-icon-wrap">
+                  @if (getServiceIcon(service); as serviceIcon) {
+                    <img [src]="serviceIcon" [alt]="getServiceName(service)" class="service-icon-image" />
+                  } @else {
+                    <i data-lucide="briefcase-business" class="service-icon-fallback"></i>
+                  }
+                </div>
+
+                <div class="service-category">{{ getServiceCategoryName(service) }}</div>
+                <h3>{{ getServiceName(service) }}</h3>
+                <p>{{ getServiceDescription(service) }}</p>
+
+                <a [routerLink]="getServiceLink(service)" class="service-card__action">
+                  {{ locale.t('readMore') }}
+                  <i data-lucide="arrow-left"></i>
+                </a>
+              </article>
+            }
+          } @else {
+            <div class="services-empty">
+              {{ locale.locale() === 'ar' ? 'لا توجد خدمات متاحة حالياً.' : 'No services are available right now.' }}
+            </div>
+          }
+        </div>
+      </main>
+
+      <aside class="services-sidebar">
+        <h2>{{ locale.t('servicesFilterBy') }}</h2>
+        <div class="category-list">
+          @for (category of vm?.categories; track trackByCategoryId($index, category)) {
+            <a
+              [routerLink]="getCategoryLink()"
+              [queryParams]="{ category: category.id }"
+              class="category-item"
+              [class.active]="vm?.activeCategory?.id === category.id">
+              <span class="category-item__box" aria-hidden="true"></span>
+              <span>{{ getCategoryName(category) }}</span>
+            </a>
+          }
+        </div>
+      </aside>
+    </div>
+  </section>
+</section>

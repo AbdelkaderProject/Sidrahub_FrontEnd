@@ -1,0 +1,29 @@
+<section class="all-page">
+  <div class="all-page__hero">
+    <div class="service-container">
+      <div class="section-line"></div>
+      <h1>{{ locale.t('teamLabel') }}</h1>
+      <p>{{ locale.t('teamTitle') }}</p>
+    </div>
+  </div>
+
+  <div class="service-container all-page__body">
+    @let members = members$ | async;
+
+    @if (members?.length) {
+      <div class="team-grid">
+        @for (member of members; track member.id) {
+          <article class="team-card">
+            <div class="team-card__avatar">{{ getMemberName(member).slice(0, 1) }}</div>
+            <h3>{{ getMemberName(member) }}</h3>
+            <p>{{ getMemberRole(member) }}</p>
+          </article>
+        }
+      </div>
+    } @else {
+      <div class="all-page__empty">
+        {{ locale.locale() === 'ar' ? 'لا يوجد أعضاء فريق حالياً.' : 'No team members available right now.' }}
+      </div>
+    }
+  </div>
+</section>

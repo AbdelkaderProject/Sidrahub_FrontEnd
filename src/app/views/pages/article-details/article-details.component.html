@@ -1,0 +1,79 @@
+@if (page$ | async; as page) {
+  <section class="article-details-page">
+    <section
+      class="article-details-hero"
+      [style.background-image]="'linear-gradient(rgba(10, 46, 26, 0.82), rgba(10, 46, 26, 0.82)), url(' + page.image + ')'">
+      <div class="article-details-hero__content">
+        <div class="article-details-hero__line"></div>
+        <span class="article-details-hero__badge">{{ page.categoryName }}</span>
+        <h1>{{ page.title }}</h1>
+        <div class="article-details-hero__breadcrumb">
+          <a [routerLink]="locale.route('/home')">{{ locale.locale() === 'ar' ? 'الرئيسية' : 'Home' }}</a>
+          <span>/</span>
+          <a [routerLink]="locale.route('/blog')">{{ locale.locale() === 'ar' ? 'أخبارنا & مقالات' : 'Articles & News' }}</a>
+          <span>/</span>
+          <span>{{ page.title }}</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="article-details-shell">
+      <div class="article-details-shell__inner">
+        <main class="article-details-main">
+          <article class="article-details-card">
+            <div class="article-details-card__media">
+              @if (!hasArticleImageError(page.image)) {
+                <img [src]="page.image" [alt]="page.title" (error)="onArticleImageError(page.image)" />
+              } @else {
+                <div class="article-details-card__fallback" aria-hidden="true">
+                  <i data-lucide="newspaper"></i>
+                </div>
+              }
+            </div>
+
+            <div class="article-details-card__meta">
+              <span class="article-details-card__pill">{{ page.categoryName }}</span>
+              <span class="article-details-card__id">#{{ page.id }}</span>
+            </div>
+
+            <div class="article-details-card__intro">
+              <h2>{{ page.title }}</h2>
+              <p>{{ page.summary }}</p>
+            </div>
+
+            <div class="article-details-card__body">
+              <div class="section-line"></div>
+              <h3>{{ locale.locale() === 'ar' ? 'التفاصيل الكاملة' : 'Full description' }}</h3>
+              <p>{{ page.description }}</p>
+            </div>
+          </article>
+        </main>
+
+        <aside class="article-details-sidebar">
+          <div class="article-details-sidebar__panel">
+            <div class="article-details-sidebar__eyebrow">{{ locale.locale() === 'ar' ? 'أحدث المقالات' : 'Latest articles' }}</div>
+            @for (article of page.relatedArticles; track article.id) {
+              <a [routerLink]="getArticleLink(article.id)" class="related-article">
+                <img [src]="article.image" [alt]="article.title" />
+                <span>{{ article.title }}</span>
+              </a>
+            } @empty {
+              <div class="related-article related-article--empty">
+                {{ locale.locale() === 'ar' ? 'لا توجد مقالات أخرى حالياً' : 'No other articles right now' }}
+              </div>
+            }
+          </div>
+        </aside>
+      </div>
+    </section>
+  </section>
+} @else {
+  <section class="article-details-not-found">
+    <div class="article-details-not-found__card">
+      <div class="section-line"></div>
+      <h2>{{ locale.locale() === 'ar' ? 'المقال غير موجود' : 'Article not found' }}</h2>
+      <p>{{ locale.locale() === 'ar' ? 'قد يكون الرابط غير صحيح أو تم حذف المقال.' : 'The link may be invalid or the article was removed.' }}</p>
+      <a [routerLink]="locale.route('/blog')">{{ locale.locale() === 'ar' ? 'العودة إلى المقالات' : 'Back to articles' }}</a>
+    </div>
+  </section>
+}

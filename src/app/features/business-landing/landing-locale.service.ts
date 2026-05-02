@@ -10,6 +10,19 @@ export class LandingLocaleService {
 
   readonly langAttr = computed(() => (this.locale() === 'ar' ? 'ar' : 'en'));
 
+  route(path: string): string {
+    const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+    if (this.locale() !== 'ar') {
+      return normalizedPath;
+    }
+
+    if (normalizedPath === '/ar' || normalizedPath.startsWith('/ar/')) {
+      return normalizedPath;
+    }
+
+    return `/ar${normalizedPath}`;
+  }
+
   setLocale(next: LandingLocale): void {
     this.locale.set(next);
   }

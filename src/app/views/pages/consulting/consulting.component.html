@@ -67,9 +67,12 @@
             <label for="service">الخدمة</label>
             <div class="select-wrap">
               <select id="service" formControlName="service">
-                <option *ngFor="let service of services" [value]="service.value" [disabled]="service.value === ''">
-                  {{ service.label }}
-                </option>
+                <option value="" disabled>اختر الخدمة المناسبة</option>
+                @for (service of serviceOptions(); track service.value) {
+                  <option [value]="service.value" [disabled]="service.value === ''">
+                    {{ service.label }}
+                  </option>
+                }
               </select>
               <span class="select-chevron" aria-hidden="true">
                 <svg viewBox="0 0 24 24" fill="none">
@@ -124,10 +127,10 @@
         <section class="booking-calendar">
           <div class="booking-calendar__header">
             <div class="calendar-nav">
-              <button type="button" class="calendar-nav__btn">‹</button>
-              <button type="button" class="calendar-nav__btn">›</button>
+              <button type="button" class="calendar-nav__btn" (click)="selectMonth(-1)" [disabled]="currentMonthIndex() === 0">‹</button>
+              <button type="button" class="calendar-nav__btn" (click)="selectMonth(1)" [disabled]="currentMonthIndex() >= availableMonths().length - 1">›</button>
             </div>
-            <h3>أبريل 2026</h3>
+            <h3>{{ monthTitle() || 'لا توجد مواعيد متاحة' }}</h3>
           </div>
 
           <div class="calendar-weekdays">
@@ -135,7 +138,7 @@
           </div>
 
           <div class="calendar-grid">
-            <ng-container *ngFor="let row of calendarRows">
+            <ng-container *ngFor="let row of calendarRowsDynamic()">
               <ng-container *ngFor="let dayNumber of row">
                 @if (dayNumber === 0) {
                   <span class="calendar-day calendar-day--empty"></span>
@@ -143,7 +146,8 @@
                   <button
                     type="button"
                     class="calendar-day"
-                    [class.calendar-day--active]="selectedDate().dayNumber === dayNumber"
+                    [class.calendar-day--active]="selectedDate()?.dayNumber === dayNumber"
+                    [disabled]="!getDay(dayNumber)"
                     (click)="selectDate(getDay(dayNumber)!)"
                   >
                     {{ dayNumber }}
@@ -157,21 +161,29 @@
         <aside class="booking-side booking-side--slots">
           <h3>الأوقات المتاحة</h3>
           <div class="slot-date">
-            <button type="button" class="slot-date__chip slot-date__chip--active">{{ selectedDate().dayName }}</button>
-            <button type="button" class="slot-date__chip">{{ selectedDate().monthLabel }} {{ selectedDate().dayNumber }}</button>
-          </div>
-
-          <div class="slot-list">
-            <button
-              *ngFor="let slot of selectedDate().slots"
-              type="button"
-              class="slot-item"
-              [class.slot-item--active]="selectedTime() === slot"
-              (click)="selectTime(slot)"
-            >
-              {{ slot }}
+            <button type="button" class="slot-date__chip slot-date__chip--active">
+              {{ selectedDate()?.dayName || 'لا يوجد يوم' }}
+            </button>
+            <button type="button" class="slot-date__chip">
+              {{ selectedDate()?.monthLabel || '' }} {{ selectedDate()?.dayNumber || '' }}
             </button>
           </div>
+
+          @if (selectedDate()) {
+            <div class="slot-list">
+              <button
+                *ngFor="let slot of selectedDate()?.slots ?? []"
+                type="button"
+                class="slot-item"
+                [class.slot-item--active]="selectedTime() === slot.label"
+                (click)="selectTime(slot)"
+              >
+                {{ slot.label }}
+              </button>
+            </div>
+          } @else {
+            <p class="booking-note">لا توجد مواعيد متاحة لهذا السيرفس حالياً.</p>
+          }
         </aside>
       </div>
 
@@ -195,7 +207,7 @@
       <div class="booking-modal__summary">
         <div class="booking-modal__row">
           <span>الموعد</span>
-          <strong>{{ selectedDate().fullLabel }}</strong>
+          <strong>{{ selectedDate()?.fullLabel }}</strong>
         </div>
         <div class="booking-modal__row">
           <span>الوقت</span>
@@ -211,9 +223,10 @@
         </div>
       </div>
 
-      <p class="booking-modal__message">تم إرسال تفاصيل الموعد ورابط الاجتماع إلى بريدك الإلكتروني، ويمكنك العودة أو تعديل البيانات لاحقًا.</p>
+      <p class="booking-modal__message">تم إرسال تفاصيل الموعد إلى بريدك الإلكتروني.</p>
 
       <button type="button" class="booking-btn booking-btn--full" (click)="finishBooking()">إنهاء</button>
     </div>
   </div>
 }
+

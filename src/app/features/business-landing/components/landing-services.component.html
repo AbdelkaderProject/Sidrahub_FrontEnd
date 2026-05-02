@@ -1,19 +1,25 @@
 <section class="services-sec">
   @let services = catalogItems$ | async;
+  @let categoryCards = buildCategoryCards(services ?? []);
+
   <div class="bl-container">
     <div class="section-header">
       <div class="section-line"></div>
       <div class="section-label">{{ locale.t('sectionServicesLabel') }}</div>
       <h2 class="section-title">{{ locale.t('sectionServicesTitle') }}</h2>
+      @if (locale.t('sectionServicesDescription')) {
+        <p class="section-subtitle">{{ locale.t('sectionServicesDescription') }}</p>
+      }
     </div>
+
     <div class="services-grid">
-      @if (services?.length) {
-        @for (service of services; track trackByServiceId($index, service)) {
-          <div class="service-card">
+      @if (categoryCards.length) {
+            @for (category of categoryCards; track trackByCategoryId($index, category)) {
+          <article class="service-card">
             <div class="service-icon-wrap">
-              @if (getServiceIcon(service); as serviceIcon) {
+              @if (category.icon; as serviceIcon) {
                 @if (!hasIconError(serviceIcon)) {
-                  <img [src]="serviceIcon" [alt]="getServiceName(service)" class="service-icon-image" (error)="onIconError(serviceIcon)" />
+                  <img [src]="serviceIcon" [alt]="category.name" class="service-icon-image" (error)="onIconError(serviceIcon)" />
                 } @else {
                   <i data-lucide="briefcase-business" class="service-icon-fallback"></i>
                 }
@@ -21,30 +27,22 @@
                 <i data-lucide="briefcase-business" class="service-icon-fallback"></i>
               }
             </div>
-            <div class="service-category">{{ getCategoryName(service) }}</div>
-            <h3 class="s-title"><a [routerLink]="['/services', service.id]" class="service-title-link">{{ getServiceName(service) }}</a></h3>
-            <p class="s-desc">{{ getServiceDescription(service) }}</p>
-
-            @if (getSidebarTitle(service); as sidebarTitle) {
-              <div class="service-sidebar">
-                <h4 class="service-sidebar__title">{{ sidebarTitle }}</h4>
-                <p class="service-sidebar__desc">{{ getSidebarDescription(service) }}</p>
-              </div>
-            }
-
-            <a [routerLink]="['/services', service.id]" class="s-link">
-              {{ locale.t('readMore') }}
-              <i data-lucide="arrow-left"></i>
+            <h3 class="s-title">{{ category.name }}</h3>
+            <p class="s-desc">{{ category.description }}</p>
+            <a
+              [routerLink]="getCategoryLink(category.id)"
+              [queryParams]="{ category: category.id }"
+              class="s-link">
+              <span class="s-link-arrow" aria-hidden="true">←</span>
+              <span>{{ locale.t('readMore') }}</span>
             </a>
-          </div>
+          </article>
         }
       } @else {
         <p class="services-empty">
-          {{ locale.locale() === 'ar' ? 'لا توجد خدمات متاحة حاليًا.' : 'No services are available right now.' }}
+          {{ locale.locale() === 'ar' ? 'لا توجد خدمات متاحة حالياً.' : 'No services are available right now.' }}
         </p>
       }
     </div>
   </div>
 </section>
-
-

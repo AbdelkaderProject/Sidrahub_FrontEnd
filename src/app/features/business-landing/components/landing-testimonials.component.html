@@ -29,6 +29,12 @@
         <p class="vid-role">{{ getReviewOpinion(review) }}</p>
       </div>
     </div>
+    <div class="section-footer-link">
+      <a [routerLink]="getAllReviewsLink()">
+        <span>{{ locale.t('viewAll') }}</span>
+        <i data-lucide="arrow-left"></i>
+      </a>
+    </div>
   </div>
 </section>
 

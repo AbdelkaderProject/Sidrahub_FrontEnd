@@ -38,7 +38,7 @@ export class DashboardComponent {
   readonly quickLinks: QuickLink[] = [
     { route: '/company-profiles', title: 'Company Profile', description: 'Manage the main company identity, description, logo, and business metrics.' },
     { route: '/customer-reviews', title: 'Customer Reviews', description: 'Add the reviews that appear in the "Our Clients Opinions" section on the home page.' },
-    { route: '/services', title: 'Services', description: 'Manage services, categories, packages, and what appears to clients on the platform.' },
+    { route: '/admin/services', title: 'Services', description: 'Manage services, categories, packages, and what appears to clients on the platform.' },
     { route: '/orders', title: 'Orders', description: 'Track submitted orders and follow up with clients from the admin dashboard.' },
     { route: '/partners', title: 'Partners', description: 'Manage partner logos and connect each partner to the company profile.' },
     { route: '/articles', title: 'Articles', description: 'Publish bilingual articles and manage article comments from the content section.' }

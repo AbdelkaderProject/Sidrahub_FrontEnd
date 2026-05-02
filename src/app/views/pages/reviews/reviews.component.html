@@ -1,0 +1,33 @@
+<section class="all-page">
+  <div class="all-page__hero">
+    <div class="service-container">
+      <div class="section-line"></div>
+      <h1>{{ locale.t('videoLabel') }}</h1>
+      <p>{{ locale.t('videoTitle') }}</p>
+    </div>
+  </div>
+
+  <div class="service-container all-page__body">
+    @let reviews = reviews$ | async;
+
+    @if (reviews?.length) {
+      <div class="reviews-grid">
+        @for (review of reviews; track review.id) {
+          <article class="review-card">
+            <div class="review-card__head">
+              <div class="review-card__avatar">{{ getReviewName(review).slice(0, 1) }}</div>
+              <div>
+                <h3>{{ getReviewName(review) }}</h3>
+                <p>{{ getReviewOpinion(review) }}</p>
+              </div>
+            </div>
+          </article>
+        }
+      </div>
+    } @else {
+      <div class="all-page__empty">
+        {{ locale.locale() === 'ar' ? 'لا توجد آراء متاحة حالياً.' : 'No reviews available right now.' }}
+      </div>
+    }
+  </div>
+</section>

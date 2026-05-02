@@ -20,6 +20,14 @@ import { refreshLucideIcons } from '../lucide-refresh';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LandingFooterComponent {
+  readonly defaultSocialLinks = {
+    whatsapp: 'https://www.whatsapp.com/',
+    linkedin: 'https://www.linkedin.com/',
+    twitter: 'https://x.com/',
+    facebook: 'https://www.facebook.com/',
+    instagram: 'https://www.instagram.com/'
+  } as const;
+
   readonly locale = inject(LandingLocaleService);
   private readonly publicCatalogService = inject(PublicCatalogService);
   readonly profiles$ = this.publicCatalogService.companyProfiles$;
@@ -86,5 +94,14 @@ export class LandingFooterComponent {
 
     const normalized = phone.replace(/[^\d+]/g, '').replace(/^\+/, '');
     return normalized || null;
+  }
+
+  getWhatsAppHref(profile: CompanyProfileDto | null): string {
+    const whatsAppNumber = this.normalizeWhatsApp(profile?.whatsApp);
+    return whatsAppNumber ? `https://wa.me/${whatsAppNumber}` : this.defaultSocialLinks.whatsapp;
+  }
+
+  getSocialHref(link: string | null | undefined, fallback: string): string {
+    return link || fallback;
   }
 }

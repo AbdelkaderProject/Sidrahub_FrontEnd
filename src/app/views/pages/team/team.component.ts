@@ -1,21 +1,21 @@
 import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { RouterLink } from '@angular/router';
 
+import { LandingLocaleService } from '../../../features/business-landing/landing-locale.service';
 import { PublicCatalogService, TeamMemberDto } from '../../../services/public-catalog.service';
-import { LandingLocaleService } from '../landing-locale.service';
 
 @Component({
-  selector: 'app-landing-team',
+  selector: 'app-team-page',
   standalone: true,
-  imports: [AsyncPipe, RouterLink],
-  templateUrl: './landing-team.component.html',
+  imports: [AsyncPipe],
+  templateUrl: './team.component.html',
+  styleUrl: './team.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class LandingTeamComponent {
+export class TeamComponent {
   readonly locale = inject(LandingLocaleService);
   private readonly publicCatalogService = inject(PublicCatalogService);
-  readonly teamMembers$ = this.publicCatalogService.teamMembers$;
+  readonly members$ = this.publicCatalogService.teamMembers$;
 
   getMemberName(member: TeamMemberDto): string {
     return this.locale.locale() === 'ar' ? member.nameAr : member.nameEn;
@@ -23,14 +23,5 @@ export class LandingTeamComponent {
 
   getMemberRole(member: TeamMemberDto): string {
     return this.locale.locale() === 'ar' ? member.descriptionAr : member.descriptionEn;
-  }
-
-  getInitials(member: TeamMemberDto): string {
-    const name = this.getMemberName(member).trim();
-    return name ? name.charAt(0) : 'M';
-  }
-
-  getAllTeamLink(): string {
-    return this.locale.route('/team');
   }
 }

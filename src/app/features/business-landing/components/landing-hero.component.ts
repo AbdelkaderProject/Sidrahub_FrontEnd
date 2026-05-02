@@ -9,7 +9,7 @@ import {
 import { toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 
-import { PublicCatalogService, SidebarDto } from '../../../services/public-catalog.service';
+import { PublicCatalogService, ServiceCatalogItem } from '../../../services/public-catalog.service';
 import { LandingLocaleService } from '../landing-locale.service';
 
 interface HeroSlideView {
@@ -33,15 +33,19 @@ export class LandingHeroComponent {
   readonly currentSlide = signal(0);
   readonly heroPaused = signal(false);
   private readonly resetTimer = signal(0);
-  private readonly sidebarRecords = toSignal(this.publicCatalogService.sidebars$, { initialValue: [] as SidebarDto[] });
+  private readonly serviceRecords = toSignal(this.publicCatalogService.catalogItems$ as any, {
+    initialValue: [] as ServiceCatalogItem[]
+  });
 
   readonly slides = computed(() => {
-    const sidebars = this.sidebarRecords();
-    if (sidebars.length > 0) {
-      return sidebars
-        .slice()
-        .sort((left, right) => left.id - right.id)
-        .map((sidebar) => this.mapSidebar(sidebar));
+    const services = (this.serviceRecords() ?? []) as ServiceCatalogItem[];
+    const slides = services
+      .slice()
+      .sort((left: ServiceCatalogItem, right: ServiceCatalogItem) => left.id - right.id)
+      .map((service) => this.mapService(service));
+
+    if (slides.length > 0) {
+      return slides;
     }
 
     return this.buildFallbackSlides();
@@ -92,12 +96,20 @@ export class LandingHeroComponent {
     this.heroPaused.set(paused);
   }
 
-  private mapSidebar(sidebar: SidebarDto): HeroSlideView {
+  private mapService(service: ServiceCatalogItem): HeroSlideView {
+    const sidebar = service.primarySidebar ?? service.sidebars[0] ?? null;
+
     return {
-      id: sidebar.id,
-      title: this.locale.locale() === 'ar' ? sidebar.titleAr : sidebar.titleEn,
-      description: this.locale.locale() === 'ar' ? sidebar.descriptionAr : sidebar.descriptionEn,
-      imageUrl: this.publicCatalogService.resolveAssetUrl(sidebar.image) ?? 'https://picsum.photos/800/600?random=' + sidebar.id
+      id: service.id,
+      title: this.locale.locale() === 'ar' ? sidebar?.titleAr ?? service.nameAr : sidebar?.titleEn ?? service.nameEn,
+      description:
+        this.locale.locale() === 'ar'
+          ? sidebar?.descriptionAr ?? service.shortDescriptionAr
+          : sidebar?.descriptionEn ?? service.shortDescriptionEn,
+      imageUrl:
+        this.publicCatalogService.resolveAssetUrl(sidebar?.image) ??
+        this.publicCatalogService.resolveAssetUrl(service.icon) ??
+        'https://picsum.photos/800/600?random=' + service.id
     };
   }
 

@@ -41,6 +41,15 @@ export interface ServicePackageDto {
   costAmount: number;
 }
 
+export interface ServiceSlotDto {
+  id: number;
+  serviceId: number;
+  day: string;
+  timeFrom: string;
+  timeTo: string;
+  isAvailable: boolean;
+}
+
 export interface CompanyProfileDto {
   id: number;
   nameAr: string;
@@ -109,6 +118,7 @@ export interface ArticleDto {
   descriptionAr: string;
   descriptionEn: string;
   image: string | null;
+  serviceCategoryId?: number | null;
 }
 
 export interface ServiceCatalogItem extends ServiceDto {
@@ -139,6 +149,10 @@ export class PublicCatalogService {
     .get<ServicePackageDto[]>(`${environment.apiUrl}/ServicePackages`)
     .pipe(shareReplay({ bufferSize: 1, refCount: true }));
 
+  private readonly serviceSlotsRequest$ = this.http
+    .get<ServiceSlotDto[]>(`${environment.apiUrl}/ServiceSlots`)
+    .pipe(shareReplay({ bufferSize: 1, refCount: true }));
+
   private readonly companyProfilesRequest$ = this.http
     .get<CompanyProfileDto[]>(`${environment.apiUrl}/CompanyProfiles`)
     .pipe(shareReplay({ bufferSize: 1, refCount: true }));
@@ -167,6 +181,7 @@ export class PublicCatalogService {
   readonly services$ = this.servicesRequest$;
   readonly sidebars$ = this.sidebarsRequest$;
   readonly servicePackages$ = this.servicePackagesRequest$;
+  readonly serviceSlots$ = this.serviceSlotsRequest$;
   readonly companyProfiles$ = this.companyProfilesRequest$;
   readonly branches$ = this.branchesRequest$;
   readonly customerReviews$ = this.customerReviewsRequest$;
